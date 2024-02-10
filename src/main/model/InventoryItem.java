@@ -23,6 +23,7 @@ public class InventoryItem {
             decreaseQuantity(quantity);
         } else {
             // may need to try-catch?
+            // NEED TO DELETE
             System.out.println("No quantity changed - input value is 0.");
         }
     }
@@ -42,6 +43,7 @@ public class InventoryItem {
         int quantityDecrease = this.quantity + decrease;
         if (quantityDecrease < 0) {
             // may need to try-catch?
+            // NEED TO DELETE
             System.out.println("No quantity changed - quantity cannot be negative.");
         } else {
             this.quantity = quantityDecrease;

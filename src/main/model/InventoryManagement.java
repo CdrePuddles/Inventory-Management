@@ -12,9 +12,12 @@ public class InventoryManagement {
     }
 
     // EFFECTS:     print the entire list of items, return null if empty
-    public LinkedList<InventoryItem> getList() {
-
-        return null;
+    public String getList() {
+        String output = "";
+        for (int i = 0; i < getListSize(); i++) {
+            output += outputItem(i) + "\n";
+        }
+        return output;
     }
 
     // MODIFIES:    this
@@ -35,6 +38,7 @@ public class InventoryManagement {
             this.inventoryList.remove(itemPosition);
         } else {
             //need to try catch?
+            // NEED TO DELETE
             System.out.println("Item cannot be found in the system");
         }
 

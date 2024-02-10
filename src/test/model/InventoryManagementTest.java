@@ -15,6 +15,9 @@ public class InventoryManagementTest {
     private InventoryItem testItem1;
     private InventoryItem testItem2;
     private InventoryItem testItem3;
+
+    private String output1;
+    private String output2;
     private String output3;
 
     @BeforeEach
@@ -24,10 +27,20 @@ public class InventoryManagementTest {
         testItem2 = new InventoryItem(2, "Widget B", 25, "This is the second widget");
         testItem3 = new InventoryItem(3, "Widget C", 0, "This is the third widget");
 
+        output1 = "ID: 1\n" +
+                "Title: Widget A\n" +
+                "Quantity 10\n" +
+                "Description: This is the first widget\n\n";
+
+        output2 = "ID: 2\n" +
+                "Title: Widget B\n" +
+                "Quantity 25\n" +
+                "Description: This is the second widget\n\n";
+
         output3 = "ID: 3\n" +
                 "Title: Widget C\n" +
                 "Quantity 0\n" +
-                "Description: This is the third widget\n";
+                "Description: This is the third widget\n\n";
 
         testInventoryList = new InventoryManagement();
     }
@@ -35,6 +48,24 @@ public class InventoryManagementTest {
     @Test
     void testConstructor() {
         //do I need to do this?
+    }
+
+    @Test
+    void testGetList() {
+        testInventoryList.addItem("Widget A", 10, "This is the first widget");
+        assertEquals(output1, testInventoryList.getList());
+    }
+
+    @Test
+    void testGetListMultipleItems() {
+        addThreeItems();
+
+        assertEquals(output1 + output2 + output3, testInventoryList.getList());
+    }
+
+    @Test
+    void testGetListNoItems() {
+        assertEquals("", testInventoryList.getList());
     }
 
     @Test
