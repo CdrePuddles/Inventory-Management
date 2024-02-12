@@ -1,6 +1,12 @@
 package model;
 
+import exceptions.CannotFindItemException;
+import exceptions.CannotFindItemIdException;
+import exceptions.IllegalQuantityException;
+
 import java.util.LinkedList;
+
+import static java.util.Objects.isNull;
 
 public class InventoryManagement {
 
@@ -15,7 +21,7 @@ public class InventoryManagement {
     public String getList() {
         String output = "";
         for (int i = 0; i < getListSize(); i++) {
-            output += outputItem(i) + "\n";
+            output += outputItem(i);
         }
         return output;
     }
@@ -24,6 +30,9 @@ public class InventoryManagement {
     // EFFECTS:     adds the provided inventory item to the end of the list,
     //              assigning an unique ID
     public void addItem(String title, int quantity, String description) {
+        if (quantity < 0) {
+            throw new IllegalQuantityException();
+        }
         InventoryItem inventoryItem = new InventoryItem(assignId(), title, quantity, description);
         this.inventoryList.add(inventoryItem);
     }
@@ -38,6 +47,7 @@ public class InventoryManagement {
             this.inventoryList.remove(itemPosition);
         } else {
             //need to try catch?
+            //TODO
             // NEED TO DELETE
             System.out.println("Item cannot be found in the system");
         }
@@ -56,7 +66,6 @@ public class InventoryManagement {
     }
 
 
-
     // REQUIRES:    checkItemExistsId = true
     // EFFECTS:     output the InventoryItem corresponding to the provided i-th row
     protected String outputItem(int i) {
@@ -65,23 +74,24 @@ public class InventoryManagement {
         // I think these will need to change to return a string, not print
         String id = "ID: " + item.getId() + "\n";
         String title = "Title: " + item.getTitle() + "\n";
-        String quantity = "Quantity " + item.getQuantity() + "\n";
+        String quantity = "Quantity: " + item.getQuantity() + "\n";
         String description = "Description: " + item.getDescription() + "\n";
 
-        return id + title + quantity + description;
+        return id + title + quantity + description + "\n";
     }
 
     // getters
     // REQUIRES:    inventoryList.size > 0
     // EFFECTS:     check the IDs in the list against the provided ID.
     //              output corresponding item if the ID can be found in the list
-    public void getItemFromId(int id) {
+    public String getItemFromId(int id) {
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getId() == id) {
-                outputItem(i);
+                return outputItem(i);
             }
         }
+        throw new CannotFindItemException();
     }
 
     // REQUIRES:    inventoryList.size > 0
@@ -89,12 +99,18 @@ public class InventoryManagement {
     //              true if the title can be found in the list, false if not.
     //              NOTE: the list will provide every item which satisfies the condition
     //              NOTE: case-insensitive.
-    public void getItemsFromTitle(String text) {
+    public String getItemsFromTitle(String text) {
+        String output = "";
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
-                outputItem(i);
+                output += outputItem(i);
             }
+        }
+        if (output == "") {
+            throw new CannotFindItemException();
+        } else {
+            return output;
         }
 
         //return false;
@@ -116,6 +132,14 @@ public class InventoryManagement {
     public int getListSize() {
 
         return this.inventoryList.size();
+    }
+
+    // REQUIRES:    this.inventoryList.getListSize() > 0
+    // EFFECTS:     returns the last ID in the list, the last ID will be found in the last entry of the list
+    //              useful for outputting the ID of the most recently added item
+    public int getLastIdInList() {
+
+        return this.inventoryList.get(getListSize() - 1).getId();
     }
 
 

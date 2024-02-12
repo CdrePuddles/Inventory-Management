@@ -1,5 +1,8 @@
 package ui;
 
+import exceptions.CannotFindItemIdException;
+import exceptions.CannotFindItemTitleException;
+import exceptions.IllegalQuantityException;
 import model.InventoryManagement;
 
 import java.util.Scanner;
@@ -14,11 +17,17 @@ public class InventoryApp {
         runInventoryManagement();
     }
 
+    private void runInventoryManagement() {
+        init();
+        runInitialMenu();
+
+    }
+
     // MODIFIES:    this
     // EFFECTS:     processes user input
     // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
-    private void runInventoryManagement() {
+    private void runInitialMenu() {
         boolean processNext = true;
         String command = null;
 
@@ -63,7 +72,7 @@ public class InventoryApp {
         if (command.equals("v")) {
             doViewList();
         } else if (command.equals("s")) {
-            //doSearchMenu();
+            runSearchMenu();
         } else if (command.equals("a")) {
             doAddItem();
         } else if (command.equals("r")) {
@@ -71,7 +80,7 @@ public class InventoryApp {
         } else if (command.equals("e")) {
             //doEditItemMenu();
         } else {
-            System.out.println("Invalid selection, please try again!");
+            System.out.println("Invalid selection, please try again!\n");
         }
     }
 
@@ -79,10 +88,99 @@ public class InventoryApp {
     private void doViewList() {
         String inventoryText = inventoryList.getList();
         if (inventoryText == "") {
-            System.out.println("There are currently no items in the inventory system, returning to main menu..");
+            System.out.println("There are currently no items in the inventory system, returning to main menu.. \n");
             runInventoryManagement();
         } else {
             System.out.println(inventoryText);
+        }
+    }
+
+    //TODO
+    // MODIFIES:    this
+    // EFFECTS:     processes user input
+    // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runSearchMenu() {
+        boolean processNext = true;
+        String command = null;
+
+        //displaySearchMenu();
+
+        while (processNext) {
+            displaySearchMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("b")) {
+                processNext = false;
+            } else {
+                processSearchMenu(command);
+            }
+        }
+
+        System.out.println("This is what happens when pressing b \n");
+    }
+
+    //TODO
+    // MODIFIES:    this
+    // EFFECTS:     user inputs the item title, quantity, and description to be added to the list.
+    private void processSearchMenu(String command) {
+        if (command.equals("i")) {
+            doSearchById();
+        } else if (command.equals("t")) {
+            doSearchByTitle();
+        } else if (command.equals("b")) {
+            displayInitialMenu();
+            runInitialMenu();
+        } else {
+            System.out.println("Invalid selection, please try again! \n");
+        }
+
+    }
+
+    //TODO
+    // MODIFIES:    this
+    // EFFECTS:     user inputs the item ID, which outputs the item's ID, title, description, and quantity.
+    //              if item does not exist, throw error?
+    private void doSearchById() {
+        System.out.println("Enter item ID: ");
+        String idStr = input.next();
+
+        try {
+            int searchId = Integer.parseInt(idStr);
+
+            try {
+                String output = inventoryList.getItemFromId(searchId);
+                System.out.println(output);
+            } catch (CannotFindItemIdException e) {
+                System.out.println("Could not find an inventory item with the following ID: " + searchId + "\n");
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Illegal value - please enter a number for ID! \n");
+        } finally {
+            System.out.println("Returning to previous menu... \n");
+        }
+
+
+    }
+
+    //TODO
+    // MODIFIES:    this
+    // EFFECTS:     user inputs the item ID, which outputs the item's ID, title, description, and quantity.
+    //              if item does not exist, throw error?
+    private void doSearchByTitle() {
+        // TRY... CATCH...
+        System.out.println("Please note the system will provide any item which contains part of your input.");
+        System.out.println("Enter item Title: ");
+        String searchTitle = input.next();
+
+
+        try {
+            String output = inventoryList.getItemsFromTitle(searchTitle);
+            System.out.println(output);
+        } catch (CannotFindItemTitleException e) {
+            System.out.println("Could not find any inventory item containing this value: " + searchTitle + "\n");
         }
     }
 
@@ -98,11 +196,21 @@ public class InventoryApp {
         String description = addItem.nextLine();
 
         System.out.println("Enter initial item quantity (0 or greater): ");
-        int quantity = addItem.nextInt();
+        String quantityStr = addItem.nextLine();
 
-        //TODO
-        //LIKELY NEED TO ADD TRY CATCH
-        inventoryList.addItem(title, quantity, description);
+        try {
+            int quantity = Integer.parseInt(quantityStr);
+
+            try {
+                inventoryList.addItem(title, quantity, description);
+                System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
+            } catch (IllegalQuantityException e) {
+                System.out.println("Please enter a quantity 0 or greater!  Returning to main menu... \n");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Illegal value - please enter a number for quantity!  Returning to main menu... \n");
+        }
+
     }
 
 
