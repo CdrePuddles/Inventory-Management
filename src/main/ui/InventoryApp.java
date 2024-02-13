@@ -1,6 +1,5 @@
 package ui;
 
-import exceptions.CannotFindItemException;
 import exceptions.IllegalQuantityException;
 import exceptions.NegativeQuantityException;
 import model.InventoryItem;
@@ -208,14 +207,15 @@ public class InventoryApp {
         System.out.println("Enter item Title: ");
         String searchTitle = input.next();
 
-        try {
-            String output = inventoryList.getItemsFromTitle(searchTitle);
-            System.out.println(output);
-        } catch (CannotFindItemException e) {
+        String output = inventoryList.getItemsFromTitle(searchTitle);
+
+        if (output == "") {
             System.out.println("Could not find any inventory item containing this value: " + searchTitle);
-        } finally {
-            printReturnToPreviousMenu();
+        } else {
+            System.out.println(output);
         }
+        printReturnToPreviousMenu();
+
     }
 
     // MODIFIES:    this

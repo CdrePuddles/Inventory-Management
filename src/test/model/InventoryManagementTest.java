@@ -184,16 +184,12 @@ public class InventoryManagementTest {
         assertEquals(output1 + output2 + output3, testInventoryList.getItemsFromTitle("Widget"));
     }
 
-/*    @Test
+    @Test
     void testGetItemsFromTitleNotExist() {
         // may need to work on this
         addThreeItems();
-
-        assertThrows(CannotFindItemException.class,
-                () -> {
-                    testInventoryList.getItemsFromTitle("Widget Z");
-                });
-    }*/
+        assertEquals("", testInventoryList.getItemsFromTitle("Widget Z"));
+    }
 
     @Test
     void testGetPositionOfItem() {

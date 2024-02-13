@@ -88,8 +88,8 @@ public class InventoryManagement {
 
     // REQUIRES:    inventoryList.size > 0 and hasItem = true
     // EFFECTS:     check the titles in the list against the provided title.
-    //              true if the title can be found in the list, false if not.
-    //              NOTE: the list will provide every item which satisfies the condition
+    //              output any item whose title contains the provided title
+    //              output an empty string if no item can be found
     //              NOTE: case-insensitive.
     public String getItemsFromTitle(String text) {
         String output = "";
@@ -104,7 +104,7 @@ public class InventoryManagement {
 
     // REQUIRES:    hasItem(id) = true
     // EFFECTS:     return the position of the item corresponding to the provided ID
-    //              throw CannotFindItemException() if unable to find item
+    //              return -1 if unable to find item
     public int getPositionOfItem(int id) {
         int position = -1;
         for (int i = 0; i < getListSize(); i++) {
