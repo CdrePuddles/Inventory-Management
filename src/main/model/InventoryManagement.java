@@ -1,13 +1,8 @@
 package model;
 
-import exceptions.CannotFindItemException;
-import exceptions.CannotFindItemIdException;
 import exceptions.IllegalQuantityException;
-import exceptions.InvalidQuantityException;
 
 import java.util.LinkedList;
-
-import static java.util.Objects.isNull;
 
 // Represents a list of unique inventory items
 public class InventoryManagement {

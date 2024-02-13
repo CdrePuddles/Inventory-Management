@@ -49,6 +49,19 @@ public class InventoryManagementTest {
         //do I need to do this?
     }
 
+
+    @Test
+    void testGetItem() {
+        addThreeItems();
+        //System.out.println(testInventoryList.getItem(0));
+        InventoryItem getItem = testInventoryList.getItem(0);
+        assertEquals(testItem1.getId(), getItem.getId());
+        assertEquals(testItem1.getTitle(), getItem.getTitle());
+        assertEquals(testItem1.getQuantity(), getItem.getQuantity());
+        assertEquals(testItem1.getDescription(), getItem.getDescription());
+
+    }
+
     @Test
     void testGetList() {
         testInventoryList.addItem("Widget A", 10, "This is the first widget");
@@ -105,7 +118,6 @@ public class InventoryManagementTest {
         addThreeItems();
         testInventoryList.removeItem(1);
         assertEquals(2, testInventoryList.getListSize());
-
     }
 
     @Test
@@ -116,6 +128,13 @@ public class InventoryManagementTest {
         testInventoryList.removeItem(3);
 
         assertEquals(1, testInventoryList.getListSize());
+    }
+
+    @Test
+    void testRemoveItemNoItem() {
+        addThreeItems();
+        testInventoryList.removeItem(10);
+        assertEquals(3, testInventoryList.getListSize());
     }
 
     @Test

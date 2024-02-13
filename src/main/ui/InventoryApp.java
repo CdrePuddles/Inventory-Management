@@ -200,7 +200,6 @@ public class InventoryApp {
         printReturnToPreviousMenu();
     }
 
-
     // EFFECTS:     user inputs the item title, which outputs the item's ID, title, description, and quantity.
     //              if item does not exist, throw error
     private void doSearchByTitle() {
