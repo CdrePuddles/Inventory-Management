@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.CannotFindItemException;
+import exceptions.IllegalQuantityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -87,6 +88,19 @@ public class InventoryManagementTest {
     }
 
     @Test
+    void testAddItemIllegalQuantity() {
+        assertEquals(0, testInventoryList.getListSize());
+
+        assertThrows(IllegalQuantityException.class,
+                () -> {
+                    testInventoryList.addItem("Widget A", -10, "This is the first widget");
+                });
+
+        assertEquals(0, testInventoryList.getListSize());
+
+    }
+
+    @Test
     void testRemoveItem() {
         addThreeItems();
         testInventoryList.removeItem(1);
@@ -102,16 +116,6 @@ public class InventoryManagementTest {
         testInventoryList.removeItem(3);
 
         assertEquals(1, testInventoryList.getListSize());
-    }
-
-    @Test
-    void testRemoveItemDoesNotExist() {
-        addThreeItems();
-
-        testInventoryList.removeItem(123);
-
-        assertEquals(3, testInventoryList.getListSize());
-
     }
 
     @Test
@@ -134,16 +138,16 @@ public class InventoryManagementTest {
         assertEquals(output1, testInventoryList.getItemFromId(1));
     }
 
-    // CREDIT:      Initial groundwork provided from following stackoverflow link:
+/*    // CREDIT:      Initial groundwork provided from following stackoverflow link:
     //              https://stackoverflow.com/questions/40268446/junit-5-how-to-assert-an-exception-is-thrown
     @Test
     void testCheckItemDoesNotExistId() {
         addThreeItems();
         assertThrows(CannotFindItemException.class,
-                ()->{
+                () -> {
                     testInventoryList.getItemFromId(5);
                 });
-    }
+    }*/
 
     @Test
     void testGetItemFromTitle() {
@@ -161,7 +165,7 @@ public class InventoryManagementTest {
         assertEquals(output1 + output2 + output3, testInventoryList.getItemsFromTitle("Widget"));
     }
 
-    @Test
+/*    @Test
     void testGetItemsFromTitleNotExist() {
         // may need to work on this
         addThreeItems();
@@ -169,7 +173,8 @@ public class InventoryManagementTest {
         assertThrows(CannotFindItemException.class,
                 () -> {
                     testInventoryList.getItemsFromTitle("Widget Z");
-                });    }
+                });
+    }*/
 
     @Test
     void testGetPositionOfItem() {
@@ -177,6 +182,16 @@ public class InventoryManagementTest {
         // remember zero-based indexing!
         assertEquals(1, testInventoryList.getPositionOfItem(2));
     }
+
+/*    @Test
+    void testGetPositionOfItemNotExist() {
+        addThreeItems();
+        // remember zero-based indexing!
+        assertThrows(CannotFindItemException.class,
+                () -> {
+                    testInventoryList.getPositionOfItem(8);
+                });
+    }*/
 
     @Test
     void testOutputItem() {
@@ -189,6 +204,18 @@ public class InventoryManagementTest {
     void testGetLastIdInList() {
         addThreeItems();
         assertEquals(3, testInventoryList.getLastIdInList());
+    }
+
+    @Test
+    void testHasItem() {
+        addThreeItems();
+        assertTrue(testInventoryList.hasItem(1));
+    }
+
+    @Test
+    void testHasNoItem() {
+        addThreeItems();
+        assertFalse(testInventoryList.hasItem(6));
     }
 
     private void addThreeItems() {

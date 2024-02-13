@@ -3,27 +3,20 @@ package model;
 import exceptions.CannotFindItemException;
 import exceptions.CannotFindItemIdException;
 import exceptions.IllegalQuantityException;
+import exceptions.InvalidQuantityException;
 
 import java.util.LinkedList;
 
 import static java.util.Objects.isNull;
 
+// Represents a list of unique inventory items
 public class InventoryManagement {
 
-    private LinkedList<InventoryItem> inventoryList;
+    private LinkedList<InventoryItem> inventoryList;    // list of inventory items
 
-    // constructor, not adding anything initially yet
+    // EFFECTS:     Creates an inventory list with no InventoryItems added.
     public InventoryManagement() {
         this.inventoryList = new LinkedList<InventoryItem>();
-    }
-
-    // EFFECTS:     print the entire list of items, return null if empty
-    public String getList() {
-        String output = "";
-        for (int i = 0; i < getListSize(); i++) {
-            output += outputItem(i);
-        }
-        return output;
     }
 
     // MODIFIES:    this
@@ -37,21 +30,14 @@ public class InventoryManagement {
         this.inventoryList.add(inventoryItem);
     }
 
+    // REQUIRES:    hasItem(id) = true
     // MODIFIES:    this
     // EFFECTS:     removes the inventory item corresponding to the provided ID.
-    //              assigning a unique ID
     public void removeItem(int id) {
-        // likley need to try catch
         int itemPosition = getPositionOfItem(id);
         if (itemPosition >= 0) {
             this.inventoryList.remove(itemPosition);
-        } else {
-            //need to try catch?
-            //TODO
-            // NEED TO DELETE
-            System.out.println("Item cannot be found in the system");
         }
-
     }
 
     // MODIFIES:    this
@@ -65,8 +51,16 @@ public class InventoryManagement {
         return id;
     }
 
+    // EFFECTS:     print the entire list of inventory items and their parameters
+    public String getList() {
+        String output = "";
+        for (int i = 0; i < getListSize(); i++) {
+            output += outputItem(i);
+        }
+        return output;
+    }
 
-    // REQUIRES:    checkItemExistsId = true
+    // REQUIRES:    inventoryList.get(i) exists
     // EFFECTS:     output the InventoryItem corresponding to the provided i-th row
     protected String outputItem(int i) {
         InventoryItem item = this.inventoryList.get(i);
@@ -77,24 +71,27 @@ public class InventoryManagement {
         String quantity = "Quantity: " + item.getQuantity() + "\n";
         String description = "Description: " + item.getDescription() + "\n";
 
-        return id + title + quantity + description + "\n";
+        String output = id + title + quantity + description + "\n";
+
+        return output;
     }
 
     // getters
-    // REQUIRES:    inventoryList.size > 0
+    // REQUIRES:    hasItem(id) = true
     // EFFECTS:     check the IDs in the list against the provided ID.
     //              output corresponding item if the ID can be found in the list
     public String getItemFromId(int id) {
+        String output = "";
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getId() == id) {
-                return outputItem(i);
+                output = outputItem(i);
             }
         }
-        throw new CannotFindItemException();
+        return output;
     }
 
-    // REQUIRES:    inventoryList.size > 0
+    // REQUIRES:    inventoryList.size > 0 and hasItem = true
     // EFFECTS:     check the titles in the list against the provided title.
     //              true if the title can be found in the list, false if not.
     //              NOTE: the list will provide every item which satisfies the condition
@@ -107,40 +104,49 @@ public class InventoryManagement {
                 output += outputItem(i);
             }
         }
-        if (output == "") {
-            throw new CannotFindItemException();
-        } else {
-            return output;
-        }
-
-        //return false;
+        return output;
     }
 
+    // REQUIRES:    hasItem(id) = true
     // EFFECTS:     return the position of the item corresponding to the provided ID
-    //              return -1 if ID cannot be found
+    //              throw CannotFindItemException() if unable to find item
     public int getPositionOfItem(int id) {
+        int position = -1;
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getId() == id) {
-                return i;
+                position = i;
             }
         }
-        return -1;
+        return position;
+    }
+
+    // EFFECTS:     return true if the item id can be found in the list
+    //              else, return false
+    public boolean hasItem(int id) {
+        for (int i = 0; i < getListSize(); i++) {
+            InventoryItem item = this.inventoryList.get(i);
+            if (item.getId() == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // EFFECTS:     get the size of the inventory list
     public int getListSize() {
-
         return this.inventoryList.size();
+    }
+
+    // EFFECTS:     get the size of the inventory list
+    public InventoryItem getItem(int position) {
+        return this.inventoryList.get(position);
     }
 
     // REQUIRES:    this.inventoryList.getListSize() > 0
     // EFFECTS:     returns the last ID in the list, the last ID will be found in the last entry of the list
     //              useful for outputting the ID of the most recently added item
     public int getLastIdInList() {
-
         return this.inventoryList.get(getListSize() - 1).getId();
     }
-
-
 }

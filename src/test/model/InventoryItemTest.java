@@ -1,11 +1,10 @@
 package model;
 
+import exceptions.NegativeQuantityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InventoryItemTest {
 
@@ -40,6 +39,13 @@ class InventoryItemTest {
     }
 
     @Test
+    void testQuantityZero() {
+        assertEquals(10, testItem.getQuantity());
+        testItem.updateQuantity(0);
+        assertEquals(10, testItem.getQuantity());
+    }
+
+    @Test
     void testIncreaseQuantity() {
         assertEquals(10, testItem.getQuantity());
         testItem.increaseQuantity(5);
@@ -56,7 +62,11 @@ class InventoryItemTest {
     @Test
     void testDecreaseQuantityCannotNegative() {
         assertEquals(10, testItem.getQuantity());
-        testItem.decreaseQuantity(-15);
+
+        assertThrows(NegativeQuantityException.class,
+                () -> {
+                    testItem.decreaseQuantity(-15);
+                });
         assertEquals(10, testItem.getQuantity());
     }
 
