@@ -7,16 +7,17 @@ import java.util.LinkedList;
 // Represents a list of unique inventory items
 public class InventoryManagement {
 
-    private LinkedList<InventoryItem> inventoryList;    // list of inventory items
+    private final LinkedList<InventoryItem> inventoryList;    // list of inventory items
 
     // EFFECTS:     Creates an inventory list with no InventoryItems added.
     public InventoryManagement() {
-        this.inventoryList = new LinkedList<InventoryItem>();
+        this.inventoryList = new LinkedList<>();
     }
 
     // MODIFIES:    this
     // EFFECTS:     adds the provided inventory item to the end of the list,
-    //              assigning an unique ID
+    //              assigning a unique ID
+    //              If provided quantity < 0, throw IllegalQuantityException()
     public void addItem(String title, int quantity, String description) {
         if (quantity < 0) {
             throw new IllegalQuantityException();
@@ -36,7 +37,8 @@ public class InventoryManagement {
     }
 
     // MODIFIES:    this
-    // EFFECTS:     checks through the entire list of unique IDs, and provides the next unique sequential value
+    // EFFECTS:     checks through the entire list of unique IDs, and provides the next unique sequential value.
+    //              returns 1 if no items exist in the list.
     protected int assignId() {
         int id = 1;
         for (int i = 0; i < getListSize(); i++) {
@@ -46,60 +48,46 @@ public class InventoryManagement {
         return id;
     }
 
-    // EFFECTS:     print the entire list of inventory items and their parameters
-    public String getList() {
-        String output = "";
+    // EFFECTS:     return true if the item id can be found in the list
+    //              else, return false
+    public boolean hasItem(int id) {
         for (int i = 0; i < getListSize(); i++) {
-            output += outputItem(i);
+            InventoryItem item = this.inventoryList.get(i);
+            if (item.getId() == id) {
+                return true;
+            }
         }
-        return output;
-    }
-
-    // REQUIRES:    inventoryList.get(i) exists
-    // EFFECTS:     output the InventoryItem corresponding to the provided i-th row
-    protected String outputItem(int i) {
-        InventoryItem item = this.inventoryList.get(i);
-
-        // I think these will need to change to return a string, not print
-        String id = "ID: " + item.getId() + "\n";
-        String title = "Title: " + item.getTitle() + "\n";
-        String quantity = "Quantity: " + item.getQuantity() + "\n";
-        String description = "Description: " + item.getDescription() + "\n";
-
-        String output = id + title + quantity + description + "\n";
-
-        return output;
+        return false;
     }
 
     // getters
     // REQUIRES:    hasItem(id) = true
     // EFFECTS:     check the IDs in the list against the provided ID.
-    //              output corresponding item if the ID can be found in the list
-    public String getItemFromId(int id) {
-        String output = "";
+    //              provide corresponding item if the ID can be found in the list
+    public InventoryItem getItemFromId(int id) {
+        InventoryItem ret = null;
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getId() == id) {
-                output = outputItem(i);
+                ret = this.inventoryList.get(i);
             }
         }
-        return output;
+        return ret;
     }
 
     // REQUIRES:    inventoryList.size > 0 and hasItem = true
     // EFFECTS:     check the titles in the list against the provided title.
-    //              output any item whose title contains the provided title
-    //              output an empty string if no item can be found
+    //              add to a temporary list any item whose title contains the provided title
     //              NOTE: case-insensitive.
-    public String getItemsFromTitle(String text) {
-        String output = "";
+    public LinkedList<InventoryItem> getItemsFromTitle(String text) {
+        LinkedList<InventoryItem> ret = new LinkedList<>();
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
-                output += outputItem(i);
+                ret.add(item);
             }
         }
-        return output;
+        return ret;
     }
 
     // REQUIRES:    hasItem(id) = true
@@ -116,16 +104,10 @@ public class InventoryManagement {
         return position;
     }
 
-    // EFFECTS:     return true if the item id can be found in the list
-    //              else, return false
-    public boolean hasItem(int id) {
-        for (int i = 0; i < getListSize(); i++) {
-            InventoryItem item = this.inventoryList.get(i);
-            if (item.getId() == id) {
-                return true;
-            }
-        }
-        return false;
+    // EFFECTS:     return a string of the entire list of inventory items and their parameters
+    //              if not items exist in the list, return an empty string
+    public LinkedList<InventoryItem> getList() {
+        return this.inventoryList;
     }
 
     // EFFECTS:     get the size of the inventory list

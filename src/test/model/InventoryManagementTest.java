@@ -4,19 +4,19 @@ import exceptions.IllegalQuantityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InventoryManagementTest {
 
     private InventoryManagement testInventoryList;
+    private LinkedList<InventoryItem> testInventoryList2;
 
     private InventoryItem testItem1;
     private InventoryItem testItem2;
     private InventoryItem testItem3;
-
-    private String output1;
-    private String output2;
-    private String output3;
+    private InventoryItem testItem4;
 
     @BeforeEach
     void setup() {
@@ -24,35 +24,15 @@ public class InventoryManagementTest {
         testItem1 = new InventoryItem(1, "Widget A", 10, "This is the first widget");
         testItem2 = new InventoryItem(2, "Widget B", 25, "This is the second widget");
         testItem3 = new InventoryItem(3, "Widget C", 0, "This is the third widget");
-
-        output1 = "ID: 1\n" +
-                "Title: Widget A\n" +
-                "Quantity: 10\n" +
-                "Description: This is the first widget\n\n";
-
-        output2 = "ID: 2\n" +
-                "Title: Widget B\n" +
-                "Quantity: 25\n" +
-                "Description: This is the second widget\n\n";
-
-        output3 = "ID: 3\n" +
-                "Title: Widget C\n" +
-                "Quantity: 0\n" +
-                "Description: This is the third widget\n\n";
+        testItem4 = new InventoryItem(4, "Zubat", 6, "This is the fourth item, not a widget");
 
         testInventoryList = new InventoryManagement();
     }
 
     @Test
     void testConstructor() {
-        //do I need to do this?
-    }
+        testInventoryList.addItem("Widget A", 10, "This is the first widget");
 
-
-    @Test
-    void testGetItem() {
-        addThreeItems();
-        //System.out.println(testInventoryList.getItem(0));
         InventoryItem getItem = testInventoryList.getItem(0);
         assertEquals(testItem1.getId(), getItem.getId());
         assertEquals(testItem1.getTitle(), getItem.getTitle());
@@ -62,21 +42,32 @@ public class InventoryManagementTest {
     }
 
     @Test
+    void testGetItem() {
+        addThreeItems();
+        InventoryItem getItem = testInventoryList.getItem(1);
+        assertEquals(testItem2.getId(), getItem.getId());
+        assertEquals(testItem2.getTitle(), getItem.getTitle());
+        assertEquals(testItem2.getQuantity(), getItem.getQuantity());
+        assertEquals(testItem2.getDescription(), getItem.getDescription());
+
+    }
+
+    @Test
     void testGetList() {
         testInventoryList.addItem("Widget A", 10, "This is the first widget");
-        assertEquals(output1, testInventoryList.getList());
+        assertEquals(1, testInventoryList.getList().size());
     }
 
     @Test
     void testGetListMultipleItems() {
         addThreeItems();
 
-        assertEquals(output1 + output2 + output3, testInventoryList.getList());
+        assertEquals(3, testInventoryList.getList().size());
     }
 
     @Test
     void testGetListNoItems() {
-        assertEquals("", testInventoryList.getList());
+        assertEquals(0, testInventoryList.getList().size());
     }
 
     @Test
@@ -150,29 +141,25 @@ public class InventoryManagementTest {
 
     @Test
     void testGetItemFromId() {
-        // may need to work on this
         addThreeItems();
 
-        assertEquals(output1, testInventoryList.getItemFromId(1));
+        assertEquals(testItem1.getId(), testInventoryList.getItemFromId(1).getId());
+        assertEquals(testItem1.getTitle(), testInventoryList.getItemFromId(1).getTitle());
+        assertEquals(testItem1.getQuantity(), testInventoryList.getItemFromId(1).getQuantity());
+        assertEquals(testItem1.getDescription(), testInventoryList.getItemFromId(1).getDescription());
     }
-
-/*    // CREDIT:      Initial groundwork provided from following stackoverflow link:
-    //              https://stackoverflow.com/questions/40268446/junit-5-how-to-assert-an-exception-is-thrown
-    @Test
-    void testCheckItemDoesNotExistId() {
-        addThreeItems();
-        assertThrows(CannotFindItemException.class,
-                () -> {
-                    testInventoryList.getItemFromId(5);
-                });
-    }*/
 
     @Test
     void testGetItemFromTitle() {
         // may need to work on this
         addThreeItems();
+        testInventoryList2 = testInventoryList.getItemsFromTitle("Widget B");
+        assertEquals(1, testInventoryList2.size());
 
-        assertEquals(output2, testInventoryList.getItemsFromTitle("Widget B"));
+        assertEquals(testItem2.getId(), testInventoryList2.get(0).getId());
+        assertEquals(testItem2.getTitle(), testInventoryList2.get(0).getTitle());
+        assertEquals(testItem2.getQuantity(), testInventoryList2.get(0).getQuantity());
+        assertEquals(testItem2.getDescription(), testInventoryList2.get(0).getDescription());
     }
 
     @Test
@@ -180,14 +167,35 @@ public class InventoryManagementTest {
         // may need to work on this
         addThreeItems();
 
-        assertEquals(output1 + output2 + output3, testInventoryList.getItemsFromTitle("Widget"));
+        //note that this 4th item will not appear in the list below as it is not a widget
+        testInventoryList.addItem("Zubat", 6,"This is the fourth item, not a widget");
+        assertEquals(4, testInventoryList.getListSize());
+
+        testInventoryList2 = testInventoryList.getItemsFromTitle("Widget");
+        assertEquals(3, testInventoryList2.size());
+
+        assertEquals(testItem1.getId(), testInventoryList2.get(0).getId());
+        assertEquals(testItem1.getTitle(), testInventoryList2.get(0).getTitle());
+        assertEquals(testItem1.getQuantity(), testInventoryList2.get(0).getQuantity());
+        assertEquals(testItem1.getDescription(), testInventoryList2.get(0).getDescription());
+
+        assertEquals(testItem2.getId(), testInventoryList2.get(1).getId());
+        assertEquals(testItem2.getTitle(), testInventoryList2.get(1).getTitle());
+        assertEquals(testItem2.getQuantity(), testInventoryList2.get(1).getQuantity());
+        assertEquals(testItem2.getDescription(), testInventoryList2.get(1).getDescription());
+
+        assertEquals(testItem3.getId(), testInventoryList2.get(2).getId());
+        assertEquals(testItem3.getTitle(), testInventoryList2.get(2).getTitle());
+        assertEquals(testItem3.getQuantity(), testInventoryList2.get(2).getQuantity());
+        assertEquals(testItem3.getDescription(), testInventoryList2.get(2).getDescription());
+
     }
 
     @Test
     void testGetItemsFromTitleNotExist() {
         // may need to work on this
         addThreeItems();
-        assertEquals("", testInventoryList.getItemsFromTitle("Widget Z"));
+        assertEquals(0, testInventoryList.getItemsFromTitle("Widget Z").size());
     }
 
     @Test
@@ -195,23 +203,6 @@ public class InventoryManagementTest {
         addThreeItems();
         // remember zero-based indexing!
         assertEquals(1, testInventoryList.getPositionOfItem(2));
-    }
-
-/*    @Test
-    void testGetPositionOfItemNotExist() {
-        addThreeItems();
-        // remember zero-based indexing!
-        assertThrows(CannotFindItemException.class,
-                () -> {
-                    testInventoryList.getPositionOfItem(8);
-                });
-    }*/
-
-    @Test
-    void testOutputItem() {
-        addThreeItems();
-
-        assertEquals(output3, testInventoryList.outputItem(2));
     }
 
     @Test

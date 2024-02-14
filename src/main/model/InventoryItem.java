@@ -24,8 +24,8 @@ public class InventoryItem {
     }
 
     // REQUIRES:    quantity != 0
-    // EFFECTS:     determines if the quantity update should be increase or decrease.
-    //              if value is 0, do not process quantity update.
+    // EFFECTS:     determines if the quantity update should be increased or decreased.
+    //              if value is 0, quantity update will not be processed.
     public void updateQuantity(int quantity) {
         if (quantity > 0) {
             increaseQuantity(quantity);
