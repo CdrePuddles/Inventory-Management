@@ -4,7 +4,7 @@ import exceptions.IllegalQuantityException;
 
 import java.util.LinkedList;
 
-// Represents a list of unique inventory items
+// Represents a list of unique inventory items, each having an id, title, quantity, and description
 public class InventoryManagement {
 
     private final LinkedList<InventoryItem> inventoryList;    // list of inventory items
@@ -75,9 +75,10 @@ public class InventoryManagement {
         return ret;
     }
 
-    // REQUIRES:    inventoryList.size > 0 and hasItem = true
+    // REQUIRES:    inventoryList.size > 0
     // EFFECTS:     check the titles in the list against the provided title.
     //              add to a temporary list any item whose title contains the provided title
+    //              if no criteria is matched, return an empty list
     //              NOTE: case-insensitive.
     public LinkedList<InventoryItem> getItemsFromTitle(String text) {
         LinkedList<InventoryItem> ret = new LinkedList<>();
@@ -104,8 +105,7 @@ public class InventoryManagement {
         return position;
     }
 
-    // EFFECTS:     return a string of the entire list of inventory items and their parameters
-    //              if not items exist in the list, return an empty string
+    // EFFECTS:     get the entire list of inventory items
     public LinkedList<InventoryItem> getList() {
         return this.inventoryList;
     }

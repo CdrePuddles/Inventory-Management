@@ -23,7 +23,6 @@ class InventoryItemTest {
         assertEquals("This is the first widget", testItem.getDescription());
     }
 
-    // tests increasing or decrease quantities by the provided amount
     @Test
     void testQuantityPositive() {
         assertEquals(10, testItem.getQuantity());
@@ -59,6 +58,8 @@ class InventoryItemTest {
         assertEquals(5, testItem.getQuantity());
     }
 
+    // CREDIT:      Initial groundwork provided from following stackoverflow link:
+    //              https://stackoverflow.com/questions/40268446/junit-5-how-to-assert-an-exception-is-thrown
     @Test
     void testDecreaseQuantityCannotNegative() {
         assertEquals(10, testItem.getQuantity());
@@ -70,7 +71,6 @@ class InventoryItemTest {
         assertEquals(10, testItem.getQuantity());
     }
 
-    // test setters
     @Test
     void testSetId() {
         testItem.setId(2);
@@ -96,6 +96,5 @@ class InventoryItemTest {
     void testSetDescription() {
         testItem.setDescription("This is a revised first widget");
         assertEquals("This is a revised first widget", testItem.getDescription());
-
     }
 }

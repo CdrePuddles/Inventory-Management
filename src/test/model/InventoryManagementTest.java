@@ -77,7 +77,6 @@ public class InventoryManagementTest {
         testInventoryList.addItem("Widget A", 10, "This is the first widget");
 
         assertEquals(1, testInventoryList.getListSize());
-
     }
 
     @Test
@@ -87,7 +86,6 @@ public class InventoryManagementTest {
         addThreeItems();
 
         assertEquals(3, testInventoryList.getListSize());
-
     }
 
     @Test
@@ -100,7 +98,6 @@ public class InventoryManagementTest {
                 });
 
         assertEquals(0, testInventoryList.getListSize());
-
     }
 
     @Test
@@ -168,7 +165,7 @@ public class InventoryManagementTest {
         addThreeItems();
 
         //note that this 4th item will not appear in the list below as it is not a widget
-        testInventoryList.addItem("Zubat", 6,"This is the fourth item, not a widget");
+        testInventoryList.addItem("Zubat", 6, "This is the fourth item, not a widget");
         assertEquals(4, testInventoryList.getListSize());
 
         testInventoryList2 = testInventoryList.getItemsFromTitle("Widget");
@@ -188,12 +185,10 @@ public class InventoryManagementTest {
         assertEquals(testItem3.getTitle(), testInventoryList2.get(2).getTitle());
         assertEquals(testItem3.getQuantity(), testInventoryList2.get(2).getQuantity());
         assertEquals(testItem3.getDescription(), testInventoryList2.get(2).getDescription());
-
     }
 
     @Test
     void testGetItemsFromTitleNotExist() {
-        // may need to work on this
         addThreeItems();
         assertEquals(0, testInventoryList.getItemsFromTitle("Widget Z").size());
     }
@@ -201,7 +196,6 @@ public class InventoryManagementTest {
     @Test
     void testGetPositionOfItem() {
         addThreeItems();
-        // remember zero-based indexing!
         assertEquals(1, testInventoryList.getPositionOfItem(2));
     }
 

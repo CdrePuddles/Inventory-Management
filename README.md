@@ -17,9 +17,8 @@ As a result, it is imperative that this inventory management system maintains th
 - Able to scale up or down with however many inventory items a user may desire
 
 ## User Stories
-1. As a user, I want to be able to maintain a list of unique items in my inventory collection
-2. As a user, I want to be able to add new unique items to, and remove existing items from,  my inventory collection  
-2. As a user, I want to be able to add, remove, and edit titles and descriptions on each unique item in my inventory 
-collection
-3. As a user, I want to be able to adjust the quantity of existing items in my inventory collection upwards or downwards
-4. As a user, I want to be able to view and search for items in my inventory collection
+1. As a user, I want to be able to maintain a list of unique items (each with a title, quantity, description, and unique identifier) in my inventory collection
+2. As a user, I want to be able to add new unique items to, and remove existing items from, my inventory collection  
+3. As a user, I want to be able to edit titles and descriptions on each unique item in my inventory collection
+4. As a user, I want to be able to adjust the quantity of existing items in my inventory collection upwards or downwards
+5. As a user, I want to be able to view and search for items in my inventory collection by id or by title

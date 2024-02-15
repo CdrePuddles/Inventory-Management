@@ -22,7 +22,6 @@ public class InventoryApp {
     private void runInventoryManagement() {
         init();
         runInitialMenu();
-
     }
 
     // MODIFIES:    this
@@ -32,8 +31,6 @@ public class InventoryApp {
     private void runInitialMenu() {
         boolean processNext = true;
         String command;
-
-        //init();
 
         while (processNext) {
             displayInitialMenu();
@@ -127,7 +124,7 @@ public class InventoryApp {
     }
 
     // MODIFIES:    this
-    // EFFECTS:     processes user input for the search menu
+    // EFFECTS:     processes user input for the edit menu
     // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
     private void runEditMenu() {
@@ -147,7 +144,7 @@ public class InventoryApp {
         }
     }
 
-    // EFFECTS:     process the command for the search menu
+    // EFFECTS:     process the command for the edit menu
     //                  t = edit an item's title
     //                  q = edit an item's quantity (increase or decrease)
     //                  d = edit an item's description
@@ -167,7 +164,7 @@ public class InventoryApp {
         }
     }
 
-    // EFFECTS:     view every item in the list in the order they were added
+    // EFFECTS:     view every item in the list, formatted according to their parameters, in the order they were added
     private void doViewList() {
         if (inventoryList.getListSize() == 0) {
             System.out.println("There are currently no items in the inventory system.");
@@ -181,7 +178,7 @@ public class InventoryApp {
     // EFFECTS:     search to see if an item exists with the provided id.
     //              if the item does exist, print its parameters.
     //              if item does not exist, print statement that item cannot be found
-    //              and return to the previous menu
+    //              lastly, return to the previous menu
     private void doSearchById() {
         System.out.println("Enter item ID: ");
         String idStr = input.next();
@@ -201,11 +198,10 @@ public class InventoryApp {
         printReturnToPreviousMenu();
     }
 
-
-    // EFFECTS:     user inputs the item title, which outputs the item's ID, title, description, and quantity.
-    //              if item does not exist, print relevant comment and do nothing
+    // EFFECTS:     user inputs the item title, which then outputs the parameters (ID, title, description,
+    //              and quantity.) of any item containing the input as part of its title.
+    //              if item does not exist, print "could not find..." comment and do return to previous menu
     private void doSearchByTitle() {
-        // TRY... CATCH...
         System.out.println("Please note the system will provide any item which contains part of your input.");
         System.out.println("Enter item Title: ");
         String searchTitle = input.next();
@@ -224,7 +220,8 @@ public class InventoryApp {
     // MODIFIES:    this
     // EFFECTS:     user inputs the item title, quantity, and description to be added to the list.
     //              if quantity entered is < 0, catch IllegalQuantityException.
-    //              If quantity provided is not a valid integer, catch NumberFormatException
+    //              if quantity provided is not a valid integer, catch NumberFormatException
+    //              lastly, return to the previous menu
     private void doAddItem() {
 
         System.out.println("Enter item title: ");
@@ -243,7 +240,7 @@ public class InventoryApp {
                 inventoryList.addItem(title, quantity, description);
                 System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
             } catch (IllegalQuantityException e) {
-                System.out.println("Please enter a quantity 0 or greater! \n");
+                System.out.println("Item not added - please enter a quantity 0 or greater! \n");
             }
         } catch (NumberFormatException e) {
             printIllegalValue();
@@ -257,6 +254,7 @@ public class InventoryApp {
     //              if provided id is invalid integer, do not process and printIllegalValue();
     //              if provided id cannot be found in the list of InventoryItems, do not process and
     //                  printCouldNotFindItem(removeId)
+    //              lastly, return to the previous menu
     private void doRemoveItem() {
         System.out.println("Enter ID of item to remove: ");
         String removeIdStr = input.next();
@@ -279,9 +277,10 @@ public class InventoryApp {
 
     // MODIFIES:    InventoryItem Title
     // EFFECTS:     user inputs the item ID, where the system outputs the current item parameters.
-    //              if item exists, ask for user input to adjust title
+    //              if item exists, ask for user input to adjust title and adjust item's title
     //              if input is not a valid integer, do not process and print printIllegalValue()
     //              if item does not exist, do not process and print printCouldNotFindItem(editId)
+    //              lastly, return to the previous menu
     private void doEditItemTitle() {
         System.out.println("Enter item ID: ");
         String editIdStr = input.next();
@@ -291,7 +290,7 @@ public class InventoryApp {
             if (inventoryList.hasItem(editId)) {
                 InventoryItem currentItem = inventoryList.getItem(inventoryList.getPositionOfItem(editId));
                 System.out.println("Current item parameters:");
-                System.out.println(inventoryList.getItemFromId(editId));
+                printItemParameters(inventoryList.getItemFromId(editId));
 
                 String currentTitle = currentItem.getTitle();
 
@@ -311,9 +310,10 @@ public class InventoryApp {
 
     // MODIFIES:    InventoryItem Description
     // EFFECTS:     user inputs the item ID, where the system outputs the current item parameters.
-    //              if item exists, ask for user input to adjust description
+    //              if item exists, ask for user input to adjust description and adjust item's description
     //              if input is not a valid integer, do not process and print printIllegalValue()
     //              if item does not exist, do not process and print printCouldNotFindItem(editId)
+    //              lastly, return to the previous menu
     private void doEditItemDescription() {
         System.out.println("Enter item ID: ");
         String editIdStr = input.next();
@@ -344,10 +344,11 @@ public class InventoryApp {
 
     // MODIFIES:    InventoryItem Quantity
     // EFFECTS:     user inputs the item ID, where the system outputs the current item parameters.
-    //              if item exists, ask for user input to adjust quantity
+    //              if item exists, ask for user input to adjust quantity and adjust item's quantity
     //              if item does not exist, do not process and print printCouldNotFindItem(editId)
     //              if quantity would make InventoryItem Quantity fall below 0, catch NegativeQuantityException
     //                  and do not process
+    //              lastly, return to the previous menu
     private void doEditItemQuantity() {
         System.out.println("Enter item ID: ");
         int editId = input.nextInt();
@@ -420,6 +421,7 @@ public class InventoryApp {
         System.out.println("\t b -> go back to previous menu");
     }
 
+    // EFFECTS:     print the parameters of all items in the provided list
     private void outputNumerousItemParameters(LinkedList<InventoryItem> list) {
         for (int i = 0; i < list.size(); i++) {
             printItemParameters(list.get(i));
