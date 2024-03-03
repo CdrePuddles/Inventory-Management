@@ -51,7 +51,6 @@ public class InventoryApp {
         String command;
         while (processNext) {
             displayLoadMenu();
-            //Menu(); //TODO: what?
             command = input.next();
             command = command.toLowerCase();
 
@@ -61,7 +60,6 @@ public class InventoryApp {
                 processLoadMenu(command);
             }
         }
-
         System.out.println("Thanks for using the system!");
     }
 
@@ -74,7 +72,7 @@ public class InventoryApp {
         if (command.equals("n")) {
             createNewInventoryList();
         } else if (command.equals("l")) {
-            loadExistingInventoryList();
+            loadInventoryList();
         } else {
             printInvalidSelection();
         }
@@ -87,17 +85,17 @@ public class InventoryApp {
         System.out.println("Enter a name for the new inventory list: ");
         String name = input.next();
         inventoryList = new InventoryManagement(name);
-        System.out.println("Successfully create an inventory list with name: " + name);
+        System.out.println("Successfully created an inventory list with name: " + name);
 
         runMainMenu();
     }
 
-    // MODIFIES:    inventoryList
+    // MODIFIES:    this
     // EFFECTS:     ask user to input name for the existing inventory list to load from file,
     //              if file exists, load the inventory list from JSON
     //              if files does not exist, catch FileNotFoundException
     //              if file cannot be read, catch IOException
-    private void loadExistingInventoryList() {
+    private void loadInventoryList() {
         System.out.println("Enter the name of the inventory list to load: ");
         String nameToLoad = input.next().toLowerCase().replace(" ", "");
         jsonStore = "./data/" + nameToLoad + ".json";
@@ -132,6 +130,10 @@ public class InventoryApp {
             command = command.toLowerCase();
 
             if (command.equals("b")) {
+                System.out.println("Would you like to save before going back? (y/n)");
+                if (input.next().equalsIgnoreCase("y")) {
+                    writeInventoryList();
+                }
                 processNext = false;
             } else {
                 processMainMenu(command);
@@ -150,7 +152,7 @@ public class InventoryApp {
     private void processMainMenu(String command) {
         if (command.equals("v")) {
             doViewList();
-        } else if (command.equals("s")) {
+        } else if (command.equals("c")) {
             runSearchMenu();
         } else if (command.equals("a")) {
             doAddItem();
@@ -158,6 +160,8 @@ public class InventoryApp {
             doRemoveItem();
         } else if (command.equals("e")) {
             runEditMenu();
+        } else if (command.equals("s")) {
+            writeInventoryList();
         } else {
             printInvalidSelection();
         }
@@ -419,7 +423,6 @@ public class InventoryApp {
             printIllegalValue();
         }
         printReturnToPreviousMenu();
-
     }
 
     // MODIFIES:    InventoryItem Quantity
@@ -457,6 +460,35 @@ public class InventoryApp {
         }
     }
 
+    // MODIFIES:    this
+    // EFFECTS:     ask user to confirm they wish to overwrite the existing file,
+    //              save the inventory list to file
+    //              if files does not exist, catch FileNotFoundException
+    private void writeInventoryList() {
+        System.out.println("Do you want to save and overwrite the inventory list"
+                + inventoryList.getName() + "? (y/n)");
+
+        if (!input.next().equalsIgnoreCase("y")) {
+            System.out.println("File not saved - returning to previous menu...");
+            return;
+        }
+        String nameToSave = inventoryList.getName().toLowerCase().replace(" ", "");
+        jsonStore = "./data/" + nameToSave + ".json";
+
+        try {
+            jsonWriter = new JsonWriter(jsonStore);
+            jsonWriter.open();
+            jsonWriter.write(inventoryList);
+            jsonWriter.close();
+            System.out.println("Saved " + inventoryList.getName() + " to " + jsonStore);
+            System.out.println("Loading main menu... \n");
+            //runMainMenu();
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + jsonStore + ".");
+            printReturnToPreviousMenu();
+        }
+    }
+
     // EFFECTS:     return true if the input, as a string, is a valid integer
     //              catch NumberFormatException and return false if not valid integer
     // NOTE:        useful for determining if the provided input, such as for id or quantity, is a valid integer
@@ -478,7 +510,7 @@ public class InventoryApp {
         System.out.println("Would you like to create a new list of inventory items or load an existing one from file?");
         System.out.println("Please select from the following options (case-insensitive):");
         System.out.println("\t n -> create a new list");
-        System.out.println("\t l -> load an existing list"); // TODO: detemrine if one or many lists
+        System.out.println("\t l -> load an existing list");
         System.out.println("\t q -> quit the system");
     }
 
@@ -488,10 +520,11 @@ public class InventoryApp {
         System.out.println("Main Menu");
         System.out.println("Please select from the following options (case-insensitive):");
         System.out.println("\t v -> view current list of all inventory items");
-        System.out.println("\t s -> search for item in the list");
+        System.out.println("\t c -> check for specific items in the list");
         System.out.println("\t a -> add an item to the list");
         System.out.println("\t r -> remove an item from the list");
         System.out.println("\t e -> edit an item in the list");
+        System.out.println("\t s -> save the list");
         System.out.println("\t b -> go back to previous menu");
     }
 

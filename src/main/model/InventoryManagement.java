@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.IllegalQuantityException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
 
@@ -144,13 +145,26 @@ public class InventoryManagement implements Writable {
     }
 
     // jsons
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
 
     @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put("name", name);
-        // TODO json.put("items", itemsToJson());
+        // TODO
+        json.put("items", itemsToJson());
         return json;
+    }
+
+    // EFFECTS:     returns items in this inventory list as a JSON array
+    private JSONArray itemsToJson() {
+        JSONArray jsonArray = new JSONArray();
+
+        for (InventoryItem item : inventoryList) {
+            jsonArray.put(item.toJson());
+        }
+        return jsonArray;
     }
 
 }

@@ -1,9 +1,11 @@
 package model;
 
 import exceptions.NegativeQuantityException;
+import org.json.JSONObject;
+import persistence.Writable;
 
 // Represents an inventory item having an id, title, quantity, and description
-public class InventoryItem {
+public class InventoryItem implements Writable {
 
     private int id;                 // unique indicator for inventory item
     private String title;           // title of inventory item
@@ -98,5 +100,15 @@ public class InventoryItem {
     // EFFECTS:     sets the item description to the provided title
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("title", title);
+        json.put("quantity", quantity);
+        json.put("description", description);
+        return json;
     }
 }
