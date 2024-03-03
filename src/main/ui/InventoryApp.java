@@ -4,7 +4,11 @@ import exceptions.IllegalQuantityException;
 import exceptions.NegativeQuantityException;
 import model.InventoryItem;
 import model.InventoryManagement;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -12,6 +16,11 @@ public class InventoryApp {
 
     private InventoryManagement inventoryList;
     private Scanner input;
+
+    private String jsonStore;
+
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
 
     // EFFECTS:     starts running the inventory application
     public InventoryApp() {
@@ -21,45 +30,116 @@ public class InventoryApp {
     // EFFECTS:     runs init() and loads the initial menu
     private void runInventoryManagement() {
         init();
-        runInitialMenu();
+        runLoadMenu();
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     initializes input scanner
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void init() {
+        input = new Scanner(System.in);
+        input.useDelimiter("\n");
     }
 
     // MODIFIES:    this
     // EFFECTS:     processes user input
     // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
-    private void runInitialMenu() {
+    private void runLoadMenu() {
         boolean processNext = true;
         String command;
-
         while (processNext) {
-            displayInitialMenu();
+            displayLoadMenu();
+            //Menu(); //TODO: what?
             command = input.next();
             command = command.toLowerCase();
 
             if (command.equals("q")) {
                 processNext = false;
             } else {
-                processInitialMenu(command);
+                processLoadMenu(command);
             }
         }
 
         System.out.println("Thanks for using the system!");
     }
 
-
-    // MODIFIES:    this
-    // EFFECTS:     initializes inventory list
-    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    // EFFECTS:     processes the initial menu of options
+    //              n = new inventory list
+    //              l = load an existing list
+    // CREDIT:      ths portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
-    private void init() {
-        inventoryList = new InventoryManagement();
-
-        input = new Scanner(System.in);
-        input.useDelimiter("\n");
+    private void processLoadMenu(String command) {
+        if (command.equals("n")) {
+            createNewInventoryList();
+        } else if (command.equals("l")) {
+            loadExistingInventoryList();
+        } else {
+            printInvalidSelection();
+        }
     }
 
-    // EFFECTS:     processes the initial menu of options
+    // MODIFIES:    inventoryList
+    // EFFECTS:     ask user to input name for the new inventory list,
+    //              create inventory list with the provided name
+    private void createNewInventoryList() {
+        System.out.println("Enter a name for the new inventory list: ");
+        String name = input.next();
+        inventoryList = new InventoryManagement(name);
+        System.out.println("Successfully create an inventory list with name: " + name);
+
+        runMainMenu();
+    }
+
+    // MODIFIES:    inventoryList
+    // EFFECTS:     ask user to input name for the existing inventory list to load from file,
+    //              if file exists, load the inventory list from JSON
+    //              if files does not exist, catch FileNotFoundException
+    //              if file cannot be read, catch IOException
+    private void loadExistingInventoryList() {
+        System.out.println("Enter the name of the inventory list to load: ");
+        String nameToLoad = input.next().toLowerCase().replace(" ", "");
+        jsonStore = "./data/" + nameToLoad + ".json";
+
+        try {
+            jsonReader = new JsonReader(jsonStore);
+            inventoryList = jsonReader.read();
+            System.out.println("Loaded " + inventoryList.getName() + " from " + jsonStore);
+            System.out.println("Loading main menu... \n");
+            runMainMenu();
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to find a inventory list with name: " + nameToLoad + ".");
+            System.out.println("Did you perhaps make a typo?");
+            printReturnToPreviousMenu();
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: " + jsonStore + ".");
+            printReturnToPreviousMenu();
+        }
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     processes user input
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runMainMenu() {
+        boolean processNext = true;
+        String command;
+
+        while (processNext) {
+            displayMainMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("b")) {
+                processNext = false;
+            } else {
+                processMainMenu(command);
+            }
+        }
+    }
+
+    // EFFECTS:     processes the main menu of options
     //              v = view list
     //              s = search for item
     //              a = add item
@@ -67,7 +147,7 @@ public class InventoryApp {
     //              e = edit item
     // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
-    private void processInitialMenu(String command) {
+    private void processMainMenu(String command) {
         if (command.equals("v")) {
             doViewList();
         } else if (command.equals("s")) {
@@ -116,8 +196,8 @@ public class InventoryApp {
         } else if (command.equals("t")) {
             doSearchByTitle();
         } else if (command.equals("b")) {
-            displayInitialMenu();
-            runInitialMenu();
+            displayMainMenu();
+            runMainMenu();
         } else {
             printInvalidSelection();
         }
@@ -157,8 +237,8 @@ public class InventoryApp {
         } else if (command.equals("d")) {
             doEditItemDescription();
         } else if (command.equals("b")) {
-            displayInitialMenu();
-            runInitialMenu();
+            displayMainMenu();
+            runMainMenu();
         } else {
             printInvalidSelection();
         }
@@ -389,18 +469,30 @@ public class InventoryApp {
         return true;
     }
 
-    // EFFECTS:     displays menu of initial options available to user
+
+    // EFFECTS:     displays menu of creating a new list of items or loading an existing one from file
     // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
-    private void displayInitialMenu() {
+    private void displayLoadMenu() {
         System.out.println("Welcome to the inventory management system!");
+        System.out.println("Would you like to create a new list of inventory items or load an existing one from file?");
+        System.out.println("Please select from the following options (case-insensitive):");
+        System.out.println("\t n -> create a new list");
+        System.out.println("\t l -> load an existing list"); // TODO: detemrine if one or many lists
+        System.out.println("\t q -> quit the system");
+    }
+
+
+    // EFFECTS:     displays main menu of options available to user
+    private void displayMainMenu() {
+        System.out.println("Main Menu");
         System.out.println("Please select from the following options (case-insensitive):");
         System.out.println("\t v -> view current list of all inventory items");
         System.out.println("\t s -> search for item in the list");
         System.out.println("\t a -> add an item to the list");
         System.out.println("\t r -> remove an item from the list");
         System.out.println("\t e -> edit an item in the list");
-        System.out.println("\t q -> quit the system");
+        System.out.println("\t b -> go back to previous menu");
     }
 
     // EFFECTS:     displays menu of item searchable options available to user
@@ -455,7 +547,7 @@ public class InventoryApp {
 
     // EFFECTS:     print a statement that the inputted value is illegal
     private static void printIllegalValue() {
-        System.out.println("Illegal value - please enter a number for ID!");
+        System.out.println("Illegal value - please enter a number!");
     }
 
 }

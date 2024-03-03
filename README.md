@@ -22,3 +22,6 @@ As a result, it is imperative that this inventory management system maintains th
 3. As a user, I want to be able to edit titles and descriptions on each unique item in my inventory collection
 4. As a user, I want to be able to adjust the quantity of existing items in my inventory collection upwards or downwards
 5. As a user, I want to be able to view and search for items in my inventory collection by id or by title
+6. As a user, I want to be able to save my inventory list to file (if I so choose)
+7. As a user, I want to be able to load my inventory list from file (if I so choose)
+8. TBD

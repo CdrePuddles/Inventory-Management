@@ -1,16 +1,19 @@
 package model;
 
 import exceptions.IllegalQuantityException;
+import org.json.JSONObject;
+import persistence.Writable;
 
 import java.util.LinkedList;
 
 // Represents a list of unique inventory items, each having an id, title, quantity, and description
-public class InventoryManagement {
-
+public class InventoryManagement implements Writable {
+    private String name;                                      // name of the inventory list
     private final LinkedList<InventoryItem> inventoryList;    // list of inventory items
 
     // EFFECTS:     Creates an inventory list with no InventoryItems added.
-    public InventoryManagement() {
+    public InventoryManagement(String name) {
+        this.name = name;
         this.inventoryList = new LinkedList<>();
     }
 
@@ -26,9 +29,15 @@ public class InventoryManagement {
         this.inventoryList.add(inventoryItem);
     }
 
-    // REQUIRES:    hasItem(id) = true
     // MODIFIES:    this
-    // EFFECTS:     removes the inventory item corresponding to the provided ID.
+    // EFFECTS:     adds the provided inventory item from the saved JSON file to the end of the list
+    public void addItemJson(InventoryItem inventoryItem) {
+        this.inventoryList.add(inventoryItem);
+    }
+
+    // REthQUIRES:    hasItem(id) = true
+    //    // MODIFIES:    this
+    //    // EFFECTS:     removes e inventory item corresponding to the provided ID.
     public void removeItem(int id) {
         int itemPosition = getPositionOfItem(id);
         if (itemPosition >= 0) {
@@ -61,6 +70,13 @@ public class InventoryManagement {
     }
 
     // getters
+
+    // EFFECTS:     get the name of the inventory list
+    public String getName() {
+        return this.name;
+    }
+
+
     // REQUIRES:    hasItem(id) = true
     // EFFECTS:     check the IDs in the list against the provided ID.
     //              provide corresponding item if the ID can be found in the list
@@ -126,4 +142,15 @@ public class InventoryManagement {
     public int getLastIdInList() {
         return this.inventoryList.get(getListSize() - 1).getId();
     }
+
+    // jsons
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        // TODO json.put("items", itemsToJson());
+        return json;
+    }
+
 }

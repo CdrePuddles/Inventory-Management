@@ -26,11 +26,13 @@ public class InventoryManagementTest {
         testItem3 = new InventoryItem(3, "Widget C", 0, "This is the third widget");
         testItem4 = new InventoryItem(4, "Zubat", 6, "This is the fourth item, not a widget");
 
-        testInventoryList = new InventoryManagement();
+        testInventoryList = new InventoryManagement("The greatest inventory list");
     }
 
     @Test
     void testConstructor() {
+        assertEquals("The greatest inventory list", testInventoryList.getName());
+
         testInventoryList.addItem("Widget A", 10, "This is the first widget");
 
         InventoryItem getItem = testInventoryList.getItem(0);
