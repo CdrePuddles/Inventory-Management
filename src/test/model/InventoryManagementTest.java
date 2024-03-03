@@ -82,6 +82,15 @@ public class InventoryManagementTest {
     }
 
     @Test
+    void testAddItemJson() {
+        assertEquals(0, testInventoryList.getListSize());
+
+        testInventoryList.addItemJson(testItem1);
+
+        assertEquals(1, testInventoryList.getListSize());
+    }
+
+    @Test
     void testAddMultipleItems() {
         assertEquals(0, testInventoryList.getListSize());
 

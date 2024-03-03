@@ -465,7 +465,7 @@ public class InventoryApp {
     //              save the inventory list to file
     //              if files does not exist, catch FileNotFoundException
     private void writeInventoryList() {
-        System.out.println("Do you want to save and overwrite the inventory list"
+        System.out.println("Do you want to save and overwrite the inventory list "
                 + inventoryList.getName() + "? (y/n)");
 
         if (!input.next().equalsIgnoreCase("y")) {
