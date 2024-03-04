@@ -1,0 +1,17 @@
+{
+    "name": "Test Writer List Has Items",
+    "items": [
+        {
+            "quantity": 10,
+            "description": "This is the first item",
+            "id": 1,
+            "title": "Item 1"
+        },
+        {
+            "quantity": 20,
+            "description": "This is the second item",
+            "id": 2,
+            "title": "Item 2"
+        }
+    ]
+}

@@ -24,4 +24,5 @@ As a result, it is imperative that this inventory management system maintains th
 5. As a user, I want to be able to view and search for items in my inventory collection by id or by title
 6. As a user, I want to be able to save my inventory list to file (if I so choose)
 7. As a user, I want to be able to load my inventory list from file (if I so choose)
-8. TBD
+8. As a user, I want to be able to provide a name to my inventory list to outline which inventory it is for
+9. As a user, I want to be able to save and load numerous inventory lists based upon the names of the respective lists
