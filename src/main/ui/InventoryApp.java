@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+// This is the front-end terminal interface where terminal commands will be processed.
 public class InventoryApp {
 
     private InventoryManagement inventoryList;

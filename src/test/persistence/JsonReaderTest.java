@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class JsonReaderTest extends JsonTest {
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
 
     @Test
     void testReaderNonExistentFile() {

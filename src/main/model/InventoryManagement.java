@@ -7,7 +7,7 @@ import persistence.Writable;
 
 import java.util.LinkedList;
 
-// Represents a list of unique inventory items, each having an id, title, quantity, and description
+// Represents a list (with a name) of unique inventory items, each having an id, title, quantity, and description
 public class InventoryManagement implements Writable {
     private String name;                                      // name of the inventory list
     private final LinkedList<InventoryItem> inventoryList;    // list of inventory items
@@ -148,6 +148,7 @@ public class InventoryManagement implements Writable {
     // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
     //              provided as a reference for the term project
 
+    // EFFECTS:    creates a new JSON object of the entire inventory list
     @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();

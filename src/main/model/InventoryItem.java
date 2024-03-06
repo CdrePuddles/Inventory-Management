@@ -102,6 +102,9 @@ public class InventoryItem implements Writable {
         this.description = description;
     }
 
+    // EFFECTS:     creates a JSON object of an inventory item
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
     @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();

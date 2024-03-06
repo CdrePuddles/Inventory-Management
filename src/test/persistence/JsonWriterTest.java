@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class JsonWriterTest extends JsonTest {
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
 
     private InventoryItem testItem1 =
             new InventoryItem(1, "Item 1", 10, "This is the first item");

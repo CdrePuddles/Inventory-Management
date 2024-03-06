@@ -7,9 +7,9 @@ import java.io.*;
 
 // Represents a writer that writes JSON representation of Inventory Management to file
 public class JsonWriter {
-    private static final int TAB = 4;  // TODO: will need to review what this is for
-    private PrintWriter writer;        // TODO: will need to review what this is for
-    private final String destination;        // TODO: will need to review what this is for
+    private static final int TAB = 4;  // for spacing purposes in the JSON file
+    private PrintWriter writer;        // print writer object
+    private final String destination;        // destination location
 
     // EFFECTS:     constructs writer to write to the destination file
     public JsonWriter(String destination) {
@@ -30,7 +30,6 @@ public class JsonWriter {
     // CREDIT:      this portion is substantively modelled off of the JsonSerializationDemo
     //              provided as a reference for the term project
     public void write(InventoryManagement im) {
-        //TODO: implement toJson in InventoryManagement
         JSONObject json = im.toJson();
         saveToFile(json.toString(TAB));
     }
