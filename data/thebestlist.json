@@ -12,6 +12,30 @@
             "description": "item 2",
             "id": 2,
             "title": "item 2"
+        },
+        {
+            "quantity": 333,
+            "description": "The third of all items!",
+            "id": 3,
+            "title": "Third item"
+        },
+        {
+            "quantity": 4444,
+            "description": "The fourth item added to the list",
+            "id": 4,
+            "title": "Fourth item"
+        },
+        {
+            "quantity": 5555,
+            "description": "The fifth item added to the list",
+            "id": 5,
+            "title": "Fifth item"
+        },
+        {
+            "quantity": 666,
+            "description": "The sixth item",
+            "id": 6,
+            "title": "Another item"
         }
     ]
 }

@@ -9,12 +9,15 @@ import persistence.JsonWriter;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -33,12 +36,19 @@ public class InventoryAppUI extends JFrame {
     private static final int HEIGHT = 720;
     private static final Border blackline = BorderFactory.createLineBorder(Color.black);
 
+    private JDesktopPane program;
+//    private JLabel title = new JLabel("");
+    private JInternalFrame buttons;
+    private JInternalFrame inventoryDisplay;
+    private JInternalFrame addItem;
+    private JTable inventoryTable;
 
-    private JPanel program;
-    private JLabel title = new JLabel("");
-    private JPanel inventoryDisplay = new JPanel();
+    private JTextField addTitle;
+    private JFormattedTextField addQuantity;
+    private JTextArea addDescription;
 
-    private JInternalFrame inventoryTable;
+    NumberFormat acceptOnlyIntegers = NumberFormat.getIntegerInstance();
+
 
 
     // EFFECTS:     starts running the inventory application
@@ -67,8 +77,9 @@ public class InventoryAppUI extends JFrame {
     // MODIFIES:    this
     // EFFECTS:     initializes graphical user interface elements
     private void gui() {
-        program = new JPanel(new BorderLayout(20, 15));
-        //program.addMouseListener(new MouseFocusAction());
+        //program = new JPanel(new BorderLayout(20, 15));
+        program = new JDesktopPane();
+        program.addMouseListener(new MouseFocusAction());
 
         setContentPane(program);
         setTitle("Inventory Management System");
@@ -77,9 +88,6 @@ public class InventoryAppUI extends JFrame {
         setBackground(Color.WHITE);
         setResizable(true);
 
-        //TODO
-        addInventoryArea();
-        addTitleBanner();
         addButtonPanel();
 
         //welcomeScreen();
@@ -87,26 +95,66 @@ public class InventoryAppUI extends JFrame {
         setVisible(true);
     }
 
-    private void addTitleBanner() {
-        JPanel top = new JPanel();
-        title.setFont(new Font(null, 0, 50));
-        top.add(title);
-        program.add(top, BorderLayout.NORTH);
+    private void successfulLoad() {
+        gui();
+        //title.setText(inventoryList.getName().toUpperCase());
+        addInventoryArea();
+        outputNumerousItemParameters(inventoryList.getList());
+        addItemArea();
+
+    }
+
+    private void addItemArea() {
+        addItem = new JInternalFrame("Add item", false, false, false, false);
+        //JLabel context = new JLabel("Input the following details to add an item.");
+
+        JPanel addItemPanel = new JPanel(new BorderLayout());
+        addItemPanel.setBorder(new EmptyBorder(5,5,5,5));
+        JPanel addItemGridPanel = new JPanel();
+        addItemGridPanel.setLayout(new GridLayout(3,2));
+        addTitle = new JTextField(5);
+        addQuantity = new JFormattedTextField(acceptOnlyIntegers);
+        addDescription = new JTextArea(3, 5);
+        //addDescription.setMinimumSize(new Dimension(50,50));
+        addDescription.setLineWrap(true);
+        addItemGridPanel.add(new JLabel("Title: "));
+        addItemGridPanel.add(addTitle);
+        addItemGridPanel.add(new JLabel("Quantity: "));
+        addItemGridPanel.add(addQuantity);
+        addItemGridPanel.add(new JLabel("Description: "));
+        addItemPanel.add(addItemGridPanel, BorderLayout.CENTER);
+
+        //addItem.add(context);
+        addItemPanel.add(new JButton(new AddListAction()), BorderLayout.EAST);
+        addItemPanel.add(addDescription, BorderLayout.SOUTH);
+
+        addItem.add(addItemPanel);
+        //addItem.add(new JButton(new AddListAction()));
+        addItem.setLocation(0,200);
+        addItem.pack();
+        addItem.setVisible(true);
+        addItem.setResizable(true);
+        program.add(addItem);
     }
 
     private void addInventoryArea() {
-        inventoryDisplay.setBackground(new Color(230, 252, 255));
-        program.add(inventoryDisplay, BorderLayout.CENTER);
+        inventoryDisplay = new JInternalFrame(inventoryList.getName(), true, false, false, false);
+        inventoryDisplay.setMinimumSize(new Dimension(400,400));
+        inventoryDisplay.setPreferredSize(new Dimension(600,400));
+        inventoryDisplay.setVisible(true);
     }
 
     private void addButtonPanel() {
+        buttons = new JInternalFrame("Action buttons", false, false, false, false);
+
+
         JPanel actionButtons = new JPanel();
-        actionButtons.setLayout(new GridLayout(1,9));
+        actionButtons.setLayout(new GridLayout(3,3));
         actionButtons.add(new JButton(new ViewListAction()));
         actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new AddListAction()));
+        //actionButtons.add(new JButton(new AddListAction()));
         actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new ViewListAction()));
+        actionButtons.add(new JButton(new SaveListAction()));
         actionButtons.add(new JButton(new LoadListAction()));
         actionButtons.add(new JButton(new ViewListAction()));
         actionButtons.add(new JButton(new ViewListAction()));
@@ -127,7 +175,10 @@ public class InventoryAppUI extends JFrame {
         //actionButtons.add(createPrintCombo());
 
         //controlPanel.add(actionButtons, BorderLayout.WEST);
-        program.add(actionButtons, BorderLayout.SOUTH);
+        buttons.add(actionButtons);
+        buttons.pack();
+        buttons.setVisible(true);
+        program.add(buttons);
     }
 
     // MODIFIES:    this
@@ -184,8 +235,7 @@ public class InventoryAppUI extends JFrame {
             try {
                 jsonReader = new JsonReader(jsonStore);
                 inventoryList = jsonReader.read();
-                title.setText(inventoryList.getName().toUpperCase());
-                outputNumerousItemParameters(inventoryList.getList());
+                successfulLoad();
 
             } catch (FileNotFoundException err) {
                 System.out.println("Unable to find a inventory list with name: " + nameToLoad + ".");
@@ -197,6 +247,7 @@ public class InventoryAppUI extends JFrame {
             }
         }
     }
+
 
     // MODIFIES:    this
     // EFFECTS:     processes user input
@@ -399,26 +450,33 @@ public class InventoryAppUI extends JFrame {
     private class AddListAction extends AbstractAction {
 
         AddListAction() {
-            super("Add");
+            super("ADD");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
             System.out.println("Enter item title: ");
-            String title = input.next();
+            //String title = input.next();
 
             System.out.println("Enter item description: ");
-            String description = input.next();
+            //String description = input.next();
 
             System.out.println("Enter initial item quantity (0 or greater): ");
-            String quantityStr = input.next();
+            //String quantityStr = input.next();
 
             try {
-                int quantity = Integer.parseInt(quantityStr);
+                int quantity = Integer.parseInt(addQuantity.getText().replace(",",""));
 
                 try {
-                    inventoryList.addItem(title, quantity, description);
+                    inventoryList.addItem(addTitle.getText(), quantity, addDescription.getText());
+                    addTitle.setText("");
+                    addQuantity.setText("");
+                    addDescription.setText("");
+                    inventoryDisplay.dispose();
+                    addInventoryArea();
+                    outputNumerousItemParameters(inventoryList.getList());
+
                     System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
                 } catch (IllegalQuantityException err) {
                     System.out.println("Item not added - please enter a quantity 0 or greater! \n");
@@ -590,6 +648,43 @@ public class InventoryAppUI extends JFrame {
         }
     }
 
+    private class SaveListAction extends AbstractAction {
+
+        SaveListAction() {
+            super("SAVE");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int n = JOptionPane.showConfirmDialog(null, "Would you like to save and overwrite the existing file?",
+                    "Save and Overwrite?",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (n != JOptionPane.YES_OPTION) {
+                JOptionPane.showMessageDialog(null,"File not saved!");
+                return;
+            }
+            String nameToSave = inventoryList.getName().toLowerCase().replace(" ", "");
+            jsonStore = "./data/" + nameToSave + ".json";
+
+            try {
+                jsonWriter = new JsonWriter(jsonStore);
+                jsonWriter.open();
+                jsonWriter.write(inventoryList);
+                jsonWriter.close();
+                JOptionPane.showMessageDialog(null,"Saved " + inventoryList.getName() + " to " + jsonStore);
+
+                System.out.println("Saved " + inventoryList.getName() + " to " + jsonStore);
+                System.out.println("Loading main menu... \n");
+                //runMainMenu();
+            } catch (FileNotFoundException err) {
+                System.out.println("Unable to write to file: " + jsonStore + ".");
+                printReturnToPreviousMenu();
+            }
+        }
+    }
+
+
     // MODIFIES:    this
     // EFFECTS:     ask user to confirm they wish to overwrite the existing file,
     //              save the inventory list to file
@@ -689,16 +784,34 @@ public class InventoryAppUI extends JFrame {
 
     // EFFECTS:     print the parameters of all items in the provided list
     private void outputNumerousItemParameters(LinkedList<InventoryItem> list) {
-        for (int i = 0; i < list.size(); i++) {
-            printItemParameters(list.get(i));
+        String[] column = {"ID", "TITLE", "QUANTITY", "DESCRIPTION"};
+        DefaultTableModel tableModel = new DefaultTableModel(column, 0);
+        inventoryTable = new JTable(tableModel);
+        //inventoryTable.setBounds(50, 50, 400, 400);
+
+        for (InventoryItem item : list) {
+            Object[] data = {item.getId(), item.getTitle(), item.getQuantity(), item.getDescription()};
+            tableModel.addRow(data);
         }
+
+        JScrollPane sp = new JScrollPane(inventoryTable);
+        inventoryDisplay.add(sp);
+        inventoryDisplay.pack();
+        inventoryDisplay.setLocation(250,200);
+        inventoryDisplay.setVisible(true);
+        program.add(inventoryDisplay);
     }
 
     // EFFECTS:     creates a JPanel for each inventory item, wrapping each in a black border and
     //              printing out their parameters.
     private void printItemParameters(InventoryItem item) {
-        JPanel output = new JPanel(new GridLayout(4,2));
+        String[] column = {"ID", "TITLE", "QUANTITY", "DESCRIPTION"};
+        DefaultTableModel tableModel = new DefaultTableModel(column, 0);
+        inventoryTable = new JTable(tableModel);
 
+        /*
+
+        JPanel output = new JPanel(new GridLayout(4,2));
         //output.setBorder(new EmptyBorder(10,10,10,10));
         output.setBorder(blackline);
         output.add(printJLabel("ID: "));
@@ -709,8 +822,8 @@ public class InventoryAppUI extends JFrame {
         output.add(printJLabel(Integer.toString(item.getQuantity())));
         output.add(printJLabel("Description: "));
         output.add(printJLabel(item.getDescription()));
-
-        inventoryDisplay.add(output);
+*/
+        //inventoryDisplay.add(output);
     }
 
     // EFFECTS:     converts the provided string into a JLabel with a font size of 20.
@@ -739,5 +852,6 @@ public class InventoryAppUI extends JFrame {
     private static void printIllegalValue() {
         System.out.println("Illegal value - please enter a number!");
     }
+
 
 }
