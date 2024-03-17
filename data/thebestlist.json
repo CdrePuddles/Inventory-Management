@@ -1,9 +1,17 @@
 {
-    "name": "The Best List",
-    "items": [{
-        "quantity": 11,
-        "description": "11th item",
-        "id": 1,
-        "title": "Item 11"
-    }]
+    "name": "The best list",
+    "items": [
+        {
+            "quantity": 1,
+            "description": "item 1",
+            "id": 1,
+            "title": "Item 1"
+        },
+        {
+            "quantity": 2,
+            "description": "item 2",
+            "id": 2,
+            "title": "item 2"
+        }
+    ]
 }
