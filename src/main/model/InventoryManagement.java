@@ -132,7 +132,7 @@ public class InventoryManagement implements Writable {
         return this.inventoryList.size();
     }
 
-    // EFFECTS:     get the size of the inventory list
+    // EFFECTS:     get the individual item at the specified position
     public InventoryItem getItem(int position) {
         return this.inventoryList.get(position);
     }

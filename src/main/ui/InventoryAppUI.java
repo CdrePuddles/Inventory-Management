@@ -7,6 +7,7 @@ import model.InventoryManagement;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -15,6 +16,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -49,21 +52,11 @@ public class InventoryAppUI extends JFrame {
 
     NumberFormat acceptOnlyIntegers = NumberFormat.getIntegerInstance();
 
-
-
     // EFFECTS:     starts running the inventory application
     public InventoryAppUI() {
         init();
         gui();
-        //runLoadMenu();
     }
-
-    /*
-    // EFFECTS:     runs init() and loads the initial menu
-    private void runInventoryManagement() {
-        init();
-        runLoadMenu();
-    }*/
 
     // MODIFIES:    this
     // EFFECTS:     initializes input scanner
@@ -87,36 +80,81 @@ public class InventoryAppUI extends JFrame {
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.WHITE);
         setResizable(true);
-
-        addButtonPanel();
-
-        //welcomeScreen();
-
         setVisible(true);
+
+        if (inventoryList == null) {
+            welcomeScreen();
+        } else {
+            addButtonPanel();
+        }
     }
 
     private void successfulLoad() {
         gui();
         //title.setText(inventoryList.getName().toUpperCase());
         addInventoryArea();
-        outputNumerousItemParameters(inventoryList.getList());
+        outputTable(inventoryList.getList());
         addItemArea();
 
     }
 
+    private void welcomeScreen() {
+        buttons = new JInternalFrame("Welcome!", false, false, false, false);
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+
+        try {
+            BufferedImage cat = ImageIO.read(new File("./data/cat.jpg"));
+            JLabel catImage = new JLabel(new ImageIcon(cat));
+            catImage.setBorder(new EmptyBorder(5,5,5,5));
+            catImage.setVisible(true);
+            buttonsPanel.add(catImage, BorderLayout.NORTH);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,"Unable to load splash image, continuing proram...");
+        }
+        JPanel actionButtons = new JPanel();
+        actionButtons.setLayout(new GridLayout(1,2));
+        actionButtons.add(new JButton(new LoadListAction()));
+        actionButtons.add(new JButton(new CreateListAction()));
+        buttonsPanel.add(actionButtons, BorderLayout.SOUTH);
+        buttons.add(buttonsPanel);
+
+        buttons.setVisible(true);
+        buttons.pack();
+        buttons.setLocation((program.getWidth() / 2 - buttons.getWidth() / 2),
+                (program.getHeight() / 2 - buttons.getHeight() / 2));
+        program.add(buttons);
+    }
+
+    private void addButtonPanel() {
+        buttons = new JInternalFrame("Action buttons", false, false, false, false);
+
+        JPanel actionButtons = new JPanel();
+        actionButtons.setLayout(new GridLayout(1,3));
+
+        actionButtons.add(new JButton(new ViewListAction()));
+        actionButtons.add(new JButton(new SaveListAction()));
+        actionButtons.add(new JButton(new LoadListAction()));
+        actionButtons.add(new JButton(new CreateListAction()));
+        buttons.add(actionButtons);
+        buttons.pack();
+        buttons.setVisible(true);
+        program.add(buttons);
+    }
+
     private void addItemArea() {
         addItem = new JInternalFrame("Add item", false, false, false, false);
-        //JLabel context = new JLabel("Input the following details to add an item.");
+        addItem.setMinimumSize(new Dimension(215,150));
 
         JPanel addItemPanel = new JPanel(new BorderLayout());
         addItemPanel.setBorder(new EmptyBorder(5,5,5,5));
         JPanel addItemGridPanel = new JPanel();
         addItemGridPanel.setLayout(new GridLayout(3,2));
+
         addTitle = new JTextField(5);
         addQuantity = new JFormattedTextField(acceptOnlyIntegers);
         addDescription = new JTextArea(3, 5);
-        //addDescription.setMinimumSize(new Dimension(50,50));
-        addDescription.setLineWrap(true);
+
         addItemGridPanel.add(new JLabel("Title: "));
         addItemGridPanel.add(addTitle);
         addItemGridPanel.add(new JLabel("Quantity: "));
@@ -124,12 +162,14 @@ public class InventoryAppUI extends JFrame {
         addItemGridPanel.add(new JLabel("Description: "));
         addItemPanel.add(addItemGridPanel, BorderLayout.CENTER);
 
-        //addItem.add(context);
         addItemPanel.add(new JButton(new AddListAction()), BorderLayout.EAST);
         addItemPanel.add(addDescription, BorderLayout.SOUTH);
 
+        addItemAreaToProgram(addItemPanel);
+    }
+
+    private void addItemAreaToProgram(JPanel addItemPanel) {
         addItem.add(addItemPanel);
-        //addItem.add(new JButton(new AddListAction()));
         addItem.setLocation(0,200);
         addItem.pack();
         addItem.setVisible(true);
@@ -144,62 +184,28 @@ public class InventoryAppUI extends JFrame {
         inventoryDisplay.setVisible(true);
     }
 
-    private void addButtonPanel() {
-        buttons = new JInternalFrame("Action buttons", false, false, false, false);
 
 
-        JPanel actionButtons = new JPanel();
-        actionButtons.setLayout(new GridLayout(3,3));
-        actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new ViewListAction()));
-        //actionButtons.add(new JButton(new AddListAction()));
-        actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new SaveListAction()));
-        actionButtons.add(new JButton(new LoadListAction()));
-        actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new ViewListAction()));
 
-        /*
-        actionButtons.add(new JButton(new ViewListAction()));
-        actionButtons.add(new JButton(new SearchListAction()));
-        actionButtons.add(new JButton(new AddListAction()));
-        actionButtons.add(new JButton(new RemoveListAction()));
-        actionButtons.add(new JButton(new EditListAction()));
-        actionButtons.add(new JButton(new SaveListAction()));
-        actionButtons.add(new JButton(new LoadListAction()));
-        actionButtons.add(new JButton(new CreateListAction()));
-        actionButtons.add(new JButton(new QuitListAction()));
+    // MODIFIES:    inventoryList
+    // EFFECTS:     ask user to input name for the new inventory list,
+    //              create inventory list with the provided name
+    private class CreateListAction extends AbstractAction {
 
-         */
-
-        //actionButtons.add(createPrintCombo());
-
-        //controlPanel.add(actionButtons, BorderLayout.WEST);
-        buttons.add(actionButtons);
-        buttons.pack();
-        buttons.setVisible(true);
-        program.add(buttons);
-    }
-
-    // MODIFIES:    this
-    // EFFECTS:     processes user input
-    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
-    //              provided as a reference for the term project
-    private void runLoadMenu() {
-        boolean processNext = true;
-        String command;
-        while (processNext) {
-            displayLoadMenu();
-            command = input.next();
-            command = command.toLowerCase();
-
-            if (command.equals("q")) {
-                processNext = false;
-            } else {
-                //processLoadMenu(command);
-            }
+        CreateListAction() {
+            super("NEW");
         }
-        System.out.println("Thanks for using the system!");
+
+        public void actionPerformed(ActionEvent e) {
+
+            String name = JOptionPane.showInputDialog(null,
+                    "Please input a list name.",
+                    "Enter list name...");
+            inventoryList = new InventoryManagement(name);
+            saveList();
+            successfulLoad();
+        }
+
     }
 
     // MODIFIES:    inventoryList
@@ -214,11 +220,7 @@ public class InventoryAppUI extends JFrame {
         runMainMenu();
     }
 
-    // MODIFIES:    this
-    // EFFECTS:     ask user to input name for the existing inventory list to load from file,
-    //              if file exists, load the inventory list from JSON
-    //              if files does not exist, catch FileNotFoundException
-    //              if file cannot be read, catch IOException
+    // EFFECTS:     request user input to specify name of list to load, then run loadList() with provided String name
     private class LoadListAction extends AbstractAction {
 
         LoadListAction() {
@@ -230,156 +232,35 @@ public class InventoryAppUI extends JFrame {
             String nameToLoad = JOptionPane.showInputDialog(null,
                     "Specify name of inventory list you wish to load",
                     "Enter list name...").toLowerCase().replace(" ", "");
-            jsonStore = "./data/" + nameToLoad + ".json";
-
-            try {
-                jsonReader = new JsonReader(jsonStore);
-                inventoryList = jsonReader.read();
-                successfulLoad();
-
-            } catch (FileNotFoundException err) {
-                System.out.println("Unable to find a inventory list with name: " + nameToLoad + ".");
-                System.out.println("Did you perhaps make a typo?");
-                printReturnToPreviousMenu();
-            } catch (IOException err) {
-                System.out.println("Unable to read from file: " + jsonStore + ".");
-                printReturnToPreviousMenu();
-            }
-        }
-    }
-
-
-    // MODIFIES:    this
-    // EFFECTS:     processes user input
-    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
-    //              provided as a reference for the term project
-    private void runMainMenu() {
-        boolean processNext = true;
-        String command;
-
-        while (processNext) {
-            displayMainMenu();
-            command = input.next();
-            command = command.toLowerCase();
-
-            if (command.equals("b")) {
-                System.out.println("Would you like to save before going back? (y/n)");
-                if (input.next().equalsIgnoreCase("y")) {
-                    writeInventoryList();
-                }
-                processNext = false;
-            } else {
-                processMainMenu(command);
-            }
-        }
-    }
-
-    // EFFECTS:     processes the main menu of options
-    //              v = view list
-    //              s = search for item
-    //              a = add item
-    //              r = remove item
-    //              e = edit item
-    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
-    //              provided as a reference for the term project
-    private void processMainMenu(String command) {
-        if (command.equals("v")) {
-            //doViewList();
-        } else if (command.equals("c")) {
-            runSearchMenu();
-        } else if (command.equals("a")) {
-            doAddItem();
-        } else if (command.equals("r")) {
-            doRemoveItem();
-        } else if (command.equals("e")) {
-            runEditMenu();
-        } else if (command.equals("s")) {
-            writeInventoryList();
-        } else {
-            printInvalidSelection();
+            loadList(nameToLoad);
         }
     }
 
     // MODIFIES:    this
-    // EFFECTS:     processes user input for the search menu
-    // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
-    //              provided as a reference for the term project
-    private void runSearchMenu() {
-        boolean processNext = true;
-        String command;
+    // EFFECTS:     ask user to input name for the existing inventory list to load from file,
+    //              if file exists, load the inventory list from JSON
+    //              if files does not exist, catch FileNotFoundException
+    //              if file cannot be read, catch IOException
+    private void loadList(String name) {
+        jsonStore = "./data/" + name + ".json";
 
-        //displaySearchMenu();
+        try {
+            jsonReader = new JsonReader(jsonStore);
+            inventoryList = jsonReader.read();
+            successfulLoad();
 
-        while (processNext) {
-            displaySearchMenu();
-            command = input.next();
-            command = command.toLowerCase();
-
-            if (command.equals("b")) {
-                processNext = false;
-            } else {
-                processSearchMenu(command);
-            }
+        } catch (FileNotFoundException err) {
+            System.out.println("Unable to find a inventory list with name: " + name + ".");
+            System.out.println("Did you perhaps make a typo?");
+            printReturnToPreviousMenu();
+        } catch (IOException err) {
+            System.out.println("Unable to read from file: " + jsonStore + ".");
+            printReturnToPreviousMenu();
         }
     }
 
-    // EFFECTS:     process the command for the search menu
-    //                  i = search for item by ID
-    //                  t = search for any items which include part of input
-    //                  b = go back to the previous page
-    private void processSearchMenu(String command) {
-        if (command.equals("i")) {
-            doSearchById();
-        } else if (command.equals("t")) {
-            doSearchByTitle();
-        } else if (command.equals("b")) {
-            displayMainMenu();
-            runMainMenu();
-        } else {
-            printInvalidSelection();
-        }
-    }
 
-    // MODIFIES:    this
-    // EFFECTS:     processes user input for the edit menu
-    // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
-    //              provided as a reference for the term project
-    private void runEditMenu() {
-        boolean processNext = true;
-        String command;
 
-        while (processNext) {
-            displayEditMenu();
-            command = input.next();
-            command = command.toLowerCase();
-
-            if (command.equals("b")) {
-                processNext = false;
-            } else {
-                processEditMenu(command);
-            }
-        }
-    }
-
-    // EFFECTS:     process the command for the edit menu
-    //                  t = edit an item's title
-    //                  q = edit an item's quantity (increase or decrease)
-    //                  d = edit an item's description
-    //                  b = go back to the previous page
-    private void processEditMenu(String command) {
-        if (command.equals("t")) {
-            doEditItemTitle();
-        } else if (command.equals("q")) {
-            doEditItemQuantity();
-        } else if (command.equals("d")) {
-            doEditItemDescription();
-        } else if (command.equals("b")) {
-            displayMainMenu();
-            runMainMenu();
-        } else {
-            printInvalidSelection();
-        }
-    }
 
     // EFFECTS:     view every item in the list, formatted according to their parameters, in the order they were added
     private class ViewListAction extends AbstractAction {
@@ -393,7 +274,7 @@ public class InventoryAppUI extends JFrame {
             if (inventoryList.getListSize() == 0) {
                 System.out.println("There are currently no items in the inventory system.");
             } else {
-                outputNumerousItemParameters(inventoryList.getList());
+                outputTable(inventoryList.getList());
             }
         }
     }
@@ -435,7 +316,7 @@ public class InventoryAppUI extends JFrame {
         if (listOfItems.size() == 0) {
             System.out.println("Could not find any inventory item containing this value: " + searchTitle);
         } else {
-            outputNumerousItemParameters(listOfItems);
+            outputTable(listOfItems);
         }
         printReturnToPreviousMenu();
 
@@ -475,7 +356,7 @@ public class InventoryAppUI extends JFrame {
                     addDescription.setText("");
                     inventoryDisplay.dispose();
                     addInventoryArea();
-                    outputNumerousItemParameters(inventoryList.getList());
+                    outputTable(inventoryList.getList());
 
                     System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
                 } catch (IllegalQuantityException err) {
@@ -648,6 +529,8 @@ public class InventoryAppUI extends JFrame {
         }
     }
 
+
+
     private class SaveListAction extends AbstractAction {
 
         SaveListAction() {
@@ -656,7 +539,28 @@ public class InventoryAppUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int n = JOptionPane.showConfirmDialog(null, "Would you like to save and overwrite the existing file?",
+//            int n = JOptionPane.showConfirmDialog(null, "Would you like to save and overwrite the existing file?",
+//                    "Save and Overwrite?",
+//                    JOptionPane.YES_NO_OPTION);
+//
+//            if (n != JOptionPane.YES_OPTION) {
+//                JOptionPane.showMessageDialog(null,"File not saved!");
+//                return;
+//            }
+//            String nameToSave = inventoryList.getName().toLowerCase().replace(" ", "");
+            saveList();
+
+        }
+    }
+
+    // EFFECTS:     saves the current inventory list to a file using inventorylist.getName() as the name.
+    //              invalid characters will be removed, and the string will be converted toLowerCase()
+    private void saveList() {
+        String name = inventoryList.getName().toLowerCase().replace(" ", "");
+        jsonStore = "./data/" + name + ".json";
+        if (new File(jsonStore).isFile()) {
+            int n = JOptionPane.showConfirmDialog(null,
+                    "File already exists - would you like to save and overwrite the existing file?",
                     "Save and Overwrite?",
                     JOptionPane.YES_NO_OPTION);
 
@@ -664,23 +568,19 @@ public class InventoryAppUI extends JFrame {
                 JOptionPane.showMessageDialog(null,"File not saved!");
                 return;
             }
-            String nameToSave = inventoryList.getName().toLowerCase().replace(" ", "");
-            jsonStore = "./data/" + nameToSave + ".json";
+        }
 
-            try {
-                jsonWriter = new JsonWriter(jsonStore);
-                jsonWriter.open();
-                jsonWriter.write(inventoryList);
-                jsonWriter.close();
-                JOptionPane.showMessageDialog(null,"Saved " + inventoryList.getName() + " to " + jsonStore);
+        try {
+            jsonWriter = new JsonWriter(jsonStore);
+            jsonWriter.open();
+            jsonWriter.write(inventoryList);
+            jsonWriter.close();
+            JOptionPane.showMessageDialog(null,"Saved " + inventoryList.getName() + " to " + jsonStore);
 
-                System.out.println("Saved " + inventoryList.getName() + " to " + jsonStore);
-                System.out.println("Loading main menu... \n");
-                //runMainMenu();
-            } catch (FileNotFoundException err) {
-                System.out.println("Unable to write to file: " + jsonStore + ".");
-                printReturnToPreviousMenu();
-            }
+        } catch (FileNotFoundException err) {
+            JOptionPane.showMessageDialog(null,"Unable to write to file: " + jsonStore + ".");
+            System.out.println("Unable to write to file: " + jsonStore + ".");
+            printReturnToPreviousMenu();
         }
     }
 
@@ -783,22 +683,17 @@ public class InventoryAppUI extends JFrame {
     }
 
     // EFFECTS:     print the parameters of all items in the provided list
-    private void outputNumerousItemParameters(LinkedList<InventoryItem> list) {
-        String[] column = {"ID", "TITLE", "QUANTITY", "DESCRIPTION"};
-        DefaultTableModel tableModel = new DefaultTableModel(column, 0);
+    private void outputTable(LinkedList<InventoryItem> list) {
+        InventoryTableModel tableModel = new InventoryTableModel(list);
         inventoryTable = new JTable(tableModel);
-        //inventoryTable.setBounds(50, 50, 400, 400);
-
-        for (InventoryItem item : list) {
-            Object[] data = {item.getId(), item.getTitle(), item.getQuantity(), item.getDescription()};
-            tableModel.addRow(data);
-        }
+        inventoryTable.getColumn("DESCRIPTION").setPreferredWidth(300);
 
         JScrollPane sp = new JScrollPane(inventoryTable);
         inventoryDisplay.add(sp);
         inventoryDisplay.pack();
         inventoryDisplay.setLocation(250,200);
         inventoryDisplay.setVisible(true);
+
         program.add(inventoryDisplay);
     }
 
@@ -831,6 +726,159 @@ public class InventoryAppUI extends JFrame {
         JLabel ret = new JLabel(string);
         ret.setFont(new Font(null, 0, 20));
         return ret;
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     processes user input
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runMainMenu() {
+        boolean processNext = true;
+        String command;
+
+        while (processNext) {
+            displayMainMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("b")) {
+                System.out.println("Would you like to save before going back? (y/n)");
+                if (input.next().equalsIgnoreCase("y")) {
+                    writeInventoryList();
+                }
+                processNext = false;
+            } else {
+                processMainMenu(command);
+            }
+        }
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     processes user input
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runLoadMenu() {
+        boolean processNext = true;
+        String command;
+        while (processNext) {
+            // displayLoadMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("q")) {
+                processNext = false;
+            } else {
+                //processLoadMenu(command);
+            }
+        }
+        System.out.println("Thanks for using the system!");
+    }
+
+    // EFFECTS:     processes the main menu of options
+    //              v = view list
+    //              s = search for item
+    //              a = add item
+    //              r = remove item
+    //              e = edit item
+    // CREDIT:      this portion is substantively modelled off of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void processMainMenu(String command) {
+        if (command.equals("v")) {
+            //doViewList();
+        } else if (command.equals("c")) {
+            runSearchMenu();
+        } else if (command.equals("a")) {
+            doAddItem();
+        } else if (command.equals("r")) {
+            doRemoveItem();
+        } else if (command.equals("e")) {
+            runEditMenu();
+        } else if (command.equals("s")) {
+            writeInventoryList();
+        } else {
+            printInvalidSelection();
+        }
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     processes user input for the search menu
+    // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runSearchMenu() {
+        boolean processNext = true;
+        String command;
+
+        //displaySearchMenu();
+
+        while (processNext) {
+            displaySearchMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("b")) {
+                processNext = false;
+            } else {
+                processSearchMenu(command);
+            }
+        }
+    }
+
+    // EFFECTS:     process the command for the search menu
+    //                  i = search for item by ID
+    //                  t = search for any items which include part of input
+    //                  b = go back to the previous page
+    private void processSearchMenu(String command) {
+        if (command.equals("i")) {
+            doSearchById();
+        } else if (command.equals("t")) {
+            doSearchByTitle();
+        } else if (command.equals("b")) {
+            displayMainMenu();
+            runMainMenu();
+        } else {
+            printInvalidSelection();
+        }
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     processes user input for the edit menu
+    // CREDIT:      this portion is substantively modelled offs of the AccountNotRobust TellerApp
+    //              provided as a reference for the term project
+    private void runEditMenu() {
+        boolean processNext = true;
+        String command;
+
+        while (processNext) {
+            displayEditMenu();
+            command = input.next();
+            command = command.toLowerCase();
+
+            if (command.equals("b")) {
+                processNext = false;
+            } else {
+                processEditMenu(command);
+            }
+        }
+    }
+
+    // EFFECTS:     process the command for the edit menu
+    //                  t = edit an item's title
+    //                  q = edit an item's quantity (increase or decrease)
+    //                  d = edit an item's description
+    //                  b = go back to the previous page
+    private void processEditMenu(String command) {
+        if (command.equals("t")) {
+            doEditItemTitle();
+        } else if (command.equals("q")) {
+            doEditItemQuantity();
+        } else if (command.equals("d")) {
+            doEditItemDescription();
+        } else if (command.equals("b")) {
+            displayMainMenu();
+            runMainMenu();
+        } else {
+            printInvalidSelection();
+        }
     }
 
     // EFFECTS:     print a statement that the inventory item with the provided ID could not be found.
