@@ -40,7 +40,7 @@ public class InventoryAppUI extends JFrame {
     private static final Border blackline = BorderFactory.createLineBorder(Color.black);
 
     private JDesktopPane program;
-//    private JLabel title = new JLabel("");
+    //    private JLabel title = new JLabel("");
     private JInternalFrame buttons;
     private JInternalFrame inventoryDisplay;
     private JInternalFrame addItem;
@@ -54,7 +54,7 @@ public class InventoryAppUI extends JFrame {
 
     // EFFECTS:     starts running the inventory application
     public InventoryAppUI() {
-        init();
+        //init();
         gui();
     }
 
@@ -69,6 +69,8 @@ public class InventoryAppUI extends JFrame {
 
     // MODIFIES:    this
     // EFFECTS:     initializes graphical user interface elements
+    //              if no list is currently loaded, load the welcome splash screen
+    //              if a list is loaded, load action buttons panel
     private void gui() {
         //program = new JPanel(new BorderLayout(20, 15));
         program = new JDesktopPane();
@@ -89,15 +91,19 @@ public class InventoryAppUI extends JFrame {
         }
     }
 
+    // MODIFIES:    this
+    // EFFECTS:     on the successful load of an inventory list, run initial gui, inventory table, and add-item option
     private void successfulLoad() {
         gui();
-        //title.setText(inventoryList.getName().toUpperCase());
-        addInventoryArea();
-        outputTable(inventoryList.getList());
+        addInventoryArea(inventoryList.getName(), inventoryList.getList());
         addItemArea();
 
     }
 
+    // EFFECTS:     starts an initial splash screen, which gives the user the following two options:
+    //              1. load an existing inventory list
+    //              2. create a new list
+    //              the splash screen also includes a picture of an adorable, yet chonky, tabby cat
     private void welcomeScreen() {
         buttons = new JInternalFrame("Welcome!", false, false, false, false);
         JPanel buttonsPanel = new JPanel(new BorderLayout());
@@ -105,15 +111,15 @@ public class InventoryAppUI extends JFrame {
         try {
             BufferedImage cat = ImageIO.read(new File("./data/cat.jpg"));
             JLabel catImage = new JLabel(new ImageIcon(cat));
-            catImage.setBorder(new EmptyBorder(5,5,5,5));
+            catImage.setBorder(new EmptyBorder(5, 5, 5, 5));
             catImage.setVisible(true);
             buttonsPanel.add(catImage, BorderLayout.NORTH);
 
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null,"Unable to load splash image, continuing proram...");
+            JOptionPane.showMessageDialog(null, "Unable to load splash image, continuing program...");
         }
         JPanel actionButtons = new JPanel();
-        actionButtons.setLayout(new GridLayout(1,2));
+        actionButtons.setLayout(new GridLayout(1, 2));
         actionButtons.add(new JButton(new LoadListAction()));
         actionButtons.add(new JButton(new CreateListAction()));
         buttonsPanel.add(actionButtons, BorderLayout.SOUTH);
@@ -126,13 +132,22 @@ public class InventoryAppUI extends JFrame {
         program.add(buttons);
     }
 
+    // EFFECTS:     Loads the panel which includes action buttons.
+    //              1) view the active list
+    //              2) remove an item from the active list
+    //              3) search for a specific item or items
+    //              4) save the active list
+    //              5) load a new list
+    //              6) create a new list
     private void addButtonPanel() {
         buttons = new JInternalFrame("Action buttons", false, false, false, false);
 
         JPanel actionButtons = new JPanel();
-        actionButtons.setLayout(new GridLayout(1,3));
+        actionButtons.setLayout(new GridLayout(2, 3));
 
         actionButtons.add(new JButton(new ViewListAction()));
+        actionButtons.add(new JButton(new RemoveListAction()));
+        actionButtons.add(new JButton(new SearchListAction()));
         actionButtons.add(new JButton(new SaveListAction()));
         actionButtons.add(new JButton(new LoadListAction()));
         actionButtons.add(new JButton(new CreateListAction()));
@@ -142,14 +157,27 @@ public class InventoryAppUI extends JFrame {
         program.add(buttons);
     }
 
+    // EFFECTS:     creates a JInternalFrame to facilitate the addition of new items within the active inventory list
     private void addItemArea() {
         addItem = new JInternalFrame("Add item", false, false, false, false);
-        addItem.setMinimumSize(new Dimension(215,150));
+        addItem.setMinimumSize(new Dimension(215, 150));
 
         JPanel addItemPanel = new JPanel(new BorderLayout());
-        addItemPanel.setBorder(new EmptyBorder(5,5,5,5));
+        addItemPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+        JPanel addItemGridPanel = itemInputFields();
+        addItemPanel.add(addItemGridPanel, BorderLayout.CENTER);
+
+        addItemPanel.add(new JButton(new AddListAction()), BorderLayout.EAST);
+        addItemPanel.add(addDescription, BorderLayout.SOUTH);
+
+        addItemAreaToProgram(addItemPanel);
+    }
+
+    // EFFECTS:     creates the fields necessary for specifying new item parameters
+    private JPanel itemInputFields() {
         JPanel addItemGridPanel = new JPanel();
-        addItemGridPanel.setLayout(new GridLayout(3,2));
+        addItemGridPanel.setLayout(new GridLayout(3, 2));
 
         addTitle = new JTextField(5);
         addQuantity = new JFormattedTextField(acceptOnlyIntegers);
@@ -160,32 +188,26 @@ public class InventoryAppUI extends JFrame {
         addItemGridPanel.add(new JLabel("Quantity: "));
         addItemGridPanel.add(addQuantity);
         addItemGridPanel.add(new JLabel("Description: "));
-        addItemPanel.add(addItemGridPanel, BorderLayout.CENTER);
-
-        addItemPanel.add(new JButton(new AddListAction()), BorderLayout.EAST);
-        addItemPanel.add(addDescription, BorderLayout.SOUTH);
-
-        addItemAreaToProgram(addItemPanel);
+        return addItemGridPanel;
     }
 
+    // MODIFIES:    this
+    // EFFECTS:     adds the addItemArea() to the program
     private void addItemAreaToProgram(JPanel addItemPanel) {
         addItem.add(addItemPanel);
-        addItem.setLocation(0,200);
+        addItem.setLocation(0, 200);
         addItem.pack();
         addItem.setVisible(true);
         addItem.setResizable(true);
         program.add(addItem);
     }
 
-    private void addInventoryArea() {
-        inventoryDisplay = new JInternalFrame(inventoryList.getName(), true, false, false, false);
-        inventoryDisplay.setMinimumSize(new Dimension(400,400));
-        inventoryDisplay.setPreferredSize(new Dimension(600,400));
-        inventoryDisplay.setVisible(true);
+    // MODIFIES:    this
+    // EFFECTS:     creates a new JTable based on the provided list, with a title of name
+    private void addInventoryArea(String name, LinkedList<InventoryItem> list) {
+        inventoryDisplay = new InventoryTableUI(name, list, InventoryAppUI.this);
+        program.add(inventoryDisplay);
     }
-
-
-
 
     // MODIFIES:    inventoryList
     // EFFECTS:     ask user to input name for the new inventory list,
@@ -201,9 +223,13 @@ public class InventoryAppUI extends JFrame {
             String name = JOptionPane.showInputDialog(null,
                     "Please input a list name.",
                     "Enter list name...");
-            inventoryList = new InventoryManagement(name);
-            saveList();
-            successfulLoad();
+            if (name != null) {
+                inventoryList = new InventoryManagement(name);
+                saveList();
+                successfulLoad();
+            } else {
+                JOptionPane.showMessageDialog(null, "List not created - please provide a valid list name.");
+            }
         }
 
     }
@@ -248,18 +274,12 @@ public class InventoryAppUI extends JFrame {
             jsonReader = new JsonReader(jsonStore);
             inventoryList = jsonReader.read();
             successfulLoad();
-
         } catch (FileNotFoundException err) {
-            System.out.println("Unable to find a inventory list with name: " + name + ".");
-            System.out.println("Did you perhaps make a typo?");
-            printReturnToPreviousMenu();
+            JOptionPane.showMessageDialog(null, "Unable to find an inventory list with name: " + name);
         } catch (IOException err) {
-            System.out.println("Unable to read from file: " + jsonStore + ".");
-            printReturnToPreviousMenu();
+            JOptionPane.showMessageDialog(null, "Unable to read from file: " + jsonStore);
         }
     }
-
-
 
 
     // EFFECTS:     view every item in the list, formatted according to their parameters, in the order they were added
@@ -274,52 +294,76 @@ public class InventoryAppUI extends JFrame {
             if (inventoryList.getListSize() == 0) {
                 System.out.println("There are currently no items in the inventory system.");
             } else {
-                outputTable(inventoryList.getList());
+                addInventoryArea(inventoryList.getName(), inventoryList.getList());
             }
         }
     }
 
-    // MODIFIES:    this
-    // EFFECTS:     search to see if an item exists with the provided id.
-    //              if the item does exist, print its parameters.
-    //              if item does not exist, print statement that item cannot be found
-    //              lastly, return to the previous menu
-    private void doSearchById() {
-        System.out.println("Enter item ID: ");
-        String idStr = input.next();
+    // EFFECTS:     remove an item from the list by providing a valid item ID
+    private class RemoveListAction extends AbstractAction {
 
-        if (isValidInteger(idStr)) {
-            int searchId = Integer.parseInt(idStr);
+        RemoveListAction() {
+            super("REMOVE");
+        }
 
-            if (inventoryList.hasItem(searchId)) {
-                printItemParameters(inventoryList.getItemFromId(searchId));
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String remove = JOptionPane.showInputDialog(null,
+                    "Enter an item ID to remove.",
+                    "Enter integer ID...");
+            try {
+                int removeId = Integer.parseInt(remove);
+                if (inventoryList.hasItem(removeId)) {
+                    InventoryItem currentItem = inventoryList.getItem(inventoryList.getPositionOfItem(removeId));
+                    String title = currentItem.getTitle();
+                    inventoryList.removeItem(removeId);
+                    JOptionPane.showMessageDialog(null,
+                            "Item " + title + " with ID: " + removeId + " successfully removed!");
+                    reloadInventoryTable();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Unable to find an item with the ID: " + removeId,
+                            "Item Does Not Exist", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException err) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid number",
+                        "Number Format Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // EFFECTS:     view every item in the list, formatted according to their parameters, in the order they were added
+    private class SearchListAction extends AbstractAction {
+
+        SearchListAction() {
+            super("SEARCH");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LinkedList searchList = new LinkedList<InventoryItem>();
+            String search;
+            search = JOptionPane.showInputDialog(null,
+                    "Enter either an item ID (integer) to search for individual item, or a string for numerous items.",
+                    "Enter integer ID or string name...");
+            if (isValidInteger(search)) {
+                int searchId = Integer.parseInt(search);
+
+                if (inventoryList.hasItem(searchId)) {
+                    searchList.add(inventoryList.getItemFromId(searchId));
+                } else {
+                    JOptionPane.showMessageDialog(null, "Unable to find an item with the ID: " + searchId);
+                    return;
+                }
             } else {
-                printCouldNotFindItem(searchId);
+                searchList = inventoryList.getItemsFromTitle(search);
+
+                if (searchList.size() == 0) {
+                    JOptionPane.showMessageDialog(null, "Unable to find an item with the title: " + search);
+                    return;
+                }
             }
-
-        } else {
-            printIllegalValue();
+            addInventoryArea("Search", searchList);
         }
-        printReturnToPreviousMenu();
-    }
-
-    // EFFECTS:     user inputs the item title, which then outputs the parameters (ID, title, description,
-    //              and quantity.) of any item containing the input as part of its title.
-    //              if item does not exist, print "could not find..." comment and do return to previous menu
-    private void doSearchByTitle() {
-        System.out.println("Please note the system will provide any item which contains part of your input.");
-        System.out.println("Enter item Title: ");
-        String searchTitle = input.next();
-
-        LinkedList<InventoryItem> listOfItems = inventoryList.getItemsFromTitle(searchTitle);
-
-        if (listOfItems.size() == 0) {
-            System.out.println("Could not find any inventory item containing this value: " + searchTitle);
-        } else {
-            outputTable(listOfItems);
-        }
-        printReturnToPreviousMenu();
-
     }
 
 
@@ -336,38 +380,50 @@ public class InventoryAppUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            System.out.println("Enter item title: ");
-            //String title = input.next();
-
-            System.out.println("Enter item description: ");
-            //String description = input.next();
-
-            System.out.println("Enter initial item quantity (0 or greater): ");
-            //String quantityStr = input.next();
-
+            String title = addTitle.getText();
+            String quantity = addQuantity.getText();
+            String description = addDescription.getText();
+            if (checkAllFieldsExist(title, quantity, description)) {
+                return;
+            }
             try {
-                int quantity = Integer.parseInt(addQuantity.getText().replace(",",""));
+                int quantityInt = Integer.parseInt(addQuantity.getText().replace(",", ""));
 
                 try {
-                    inventoryList.addItem(addTitle.getText(), quantity, addDescription.getText());
-                    addTitle.setText("");
-                    addQuantity.setText("");
-                    addDescription.setText("");
-                    inventoryDisplay.dispose();
-                    addInventoryArea();
-                    outputTable(inventoryList.getList());
-
-                    System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
+                    inventoryList.addItem(addTitle.getText(), quantityInt, addDescription.getText());
+                    setFieldsToBlank();
+                    reloadInventoryTable();
+                    //System.out.println("Item successfully added with ID " + inventoryList.getLastIdInList() + "!\n");
                 } catch (IllegalQuantityException err) {
-                    System.out.println("Item not added - please enter a quantity 0 or greater! \n");
+                    JOptionPane.showMessageDialog(null, "Please enter a quantity greater than 0.",
+                            "Illegal Quantity", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException err) {
-                printIllegalValue();
-            } finally {
-                printReturnToPreviousMenu();
+                JOptionPane.showMessageDialog(null, "Please enter a valid number",
+                        "Number Format Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+
+        private void setFieldsToBlank() {
+            addTitle.setText("");
+            addQuantity.setText("");
+            addDescription.setText("");
+        }
+
+        private boolean checkAllFieldsExist(String title, String quantity, String description) {
+            if (title.equals("") | quantity.equals("") | description.equals("")) {
+                JOptionPane.showMessageDialog(null, "Please input all fields to add an item.",
+                        "Missing fields", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // EFFECTS:     destroys and reloads the main inventory table
+    private void reloadInventoryTable() {
+        inventoryDisplay.dispose();
+        addInventoryArea(inventoryList.getName(), inventoryList.getList());
     }
 
     // MODIFIES:    this
@@ -530,7 +586,6 @@ public class InventoryAppUI extends JFrame {
     }
 
 
-
     private class SaveListAction extends AbstractAction {
 
         SaveListAction() {
@@ -565,7 +620,7 @@ public class InventoryAppUI extends JFrame {
                     JOptionPane.YES_NO_OPTION);
 
             if (n != JOptionPane.YES_OPTION) {
-                JOptionPane.showMessageDialog(null,"File not saved!");
+                JOptionPane.showMessageDialog(null, "File not saved!");
                 return;
             }
         }
@@ -575,10 +630,10 @@ public class InventoryAppUI extends JFrame {
             jsonWriter.open();
             jsonWriter.write(inventoryList);
             jsonWriter.close();
-            JOptionPane.showMessageDialog(null,"Saved " + inventoryList.getName() + " to " + jsonStore);
+            JOptionPane.showMessageDialog(null, "Saved " + inventoryList.getName() + " to " + jsonStore);
 
         } catch (FileNotFoundException err) {
-            JOptionPane.showMessageDialog(null,"Unable to write to file: " + jsonStore + ".");
+            JOptionPane.showMessageDialog(null, "Unable to write to file: " + jsonStore + ".");
             System.out.println("Unable to write to file: " + jsonStore + ".");
             printReturnToPreviousMenu();
         }
@@ -682,20 +737,6 @@ public class InventoryAppUI extends JFrame {
         System.out.println("\t b -> go back to previous menu");
     }
 
-    // EFFECTS:     print the parameters of all items in the provided list
-    private void outputTable(LinkedList<InventoryItem> list) {
-        InventoryTableModel tableModel = new InventoryTableModel(list);
-        inventoryTable = new JTable(tableModel);
-        inventoryTable.getColumn("DESCRIPTION").setPreferredWidth(300);
-
-        JScrollPane sp = new JScrollPane(inventoryTable);
-        inventoryDisplay.add(sp);
-        inventoryDisplay.pack();
-        inventoryDisplay.setLocation(250,200);
-        inventoryDisplay.setVisible(true);
-
-        program.add(inventoryDisplay);
-    }
 
     // EFFECTS:     creates a JPanel for each inventory item, wrapping each in a black border and
     //              printing out their parameters.
@@ -719,6 +760,49 @@ public class InventoryAppUI extends JFrame {
         output.add(printJLabel(item.getDescription()));
 */
         //inventoryDisplay.add(output);
+    }
+
+    // MODIFIES:    this
+    // EFFECTS:     search to see if an item exists with the provided id.
+    //              if the item does exist, print its parameters.
+    //              if item does not exist, print statement that item cannot be found
+    //              lastly, return to the previous menu
+    private void doSearchById() {
+        System.out.println("Enter item ID: ");
+        String idStr = input.next();
+
+        if (isValidInteger(idStr)) {
+            int searchId = Integer.parseInt(idStr);
+
+            if (inventoryList.hasItem(searchId)) {
+                printItemParameters(inventoryList.getItemFromId(searchId));
+            } else {
+                printCouldNotFindItem(searchId);
+            }
+
+        } else {
+            printIllegalValue();
+        }
+        printReturnToPreviousMenu();
+    }
+
+    // EFFECTS:     user inputs the item title, which then outputs the parameters (ID, title, description,
+    //              and quantity.) of any item containing the input as part of its title.
+    //              if item does not exist, print "could not find..." comment and do return to previous menu
+    private void doSearchByTitle() {
+        System.out.println("Please note the system will provide any item which contains part of your input.");
+        System.out.println("Enter item Title: ");
+        String searchTitle = input.next();
+
+        LinkedList<InventoryItem> listOfItems = inventoryList.getItemsFromTitle(searchTitle);
+
+        if (listOfItems.size() == 0) {
+            System.out.println("Could not find any inventory item containing this value: " + searchTitle);
+        } else {
+            addInventoryArea(inventoryList.getName(), inventoryList.getList());
+        }
+        printReturnToPreviousMenu();
+
     }
 
     // EFFECTS:     converts the provided string into a JLabel with a font size of 20.

@@ -1,0 +1,17 @@
+{
+    "name": "The Maggie List",
+    "items": [
+        {
+            "quantity": 42069,
+            "description": "The Maggles Item",
+            "id": 1,
+            "title": "The Maggles"
+        },
+        {
+            "quantity": 22222,
+            "description": "22222",
+            "id": 2,
+            "title": "the Maggles 2"
+        }
+    ]
+}

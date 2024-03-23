@@ -1,0 +1,17 @@
+{
+    "name": "The Toaster List",
+    "items": [
+        {
+            "quantity": 4,
+            "description": "f",
+            "id": 1,
+            "title": "Burnt Toater"
+        },
+        {
+            "quantity": 69,
+            "description": "A non-functioning toaster.  Worthless.",
+            "id": 2,
+            "title": "The Burnt Toaster"
+        }
+    ]
+}

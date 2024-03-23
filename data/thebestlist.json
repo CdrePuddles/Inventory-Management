@@ -20,7 +20,7 @@
             "title": "Third item"
         },
         {
-            "quantity": 4444,
+            "quantity": 44,
             "description": "The fourth item added to the list",
             "id": 4,
             "title": "Fourth item"
@@ -32,10 +32,22 @@
             "title": "Fifth item"
         },
         {
-            "quantity": 69,
+            "quantity": 69500,
             "description": "The sixth item",
             "id": 6,
             "title": "Another item"
+        },
+        {
+            "quantity": 77,
+            "description": "Yep there's another one",
+            "id": 7,
+            "title": "Another item"
+        },
+        {
+            "quantity": 5454,
+            "description": "dfdfd",
+            "id": 9,
+            "title": "name"
         }
     ]
 }
