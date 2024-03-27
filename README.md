@@ -26,3 +26,33 @@ As a result, it is imperative that this inventory management system maintains th
 7. As a user, I want to be able to load my inventory list from file (if I so choose)
 8. As a user, I want to be able to provide a name to my inventory list to outline which specific inventory list it is
 9. As a user, I want to be able to save and load numerous inventory lists based upon the names of the respective lists
+
+## Instructions for Grader
+- An example list has been created for you, simply click "load" on the splash screen and enter in **The Best List**.  
+Case and space/punctuation-insensitive.
+  - Alternatively, you may create your own list and name it anything you would like. 
+    Case and space/punctuation-insensitive.
+- You can generate the first required action related to the user story, "I want to be able to add new unique items to, 
+and remove existing items from, my inventory collection" by the following:
+  - After you have created or loaded a list, there will be a section to add an item.  Provide the 1) title, 2) quantity,
+    and 3) description, then click add, to add a new item to the list.
+  - To remove an item, click the "Remove" button in the top-left, and specify the item ID # you wish to remove.
+- You can generate the second required action related to the user story, "I want to be able to view and search for items
+  in my inventory collection by id or by title" by the following:
+  - After you have created or loaded a list, there will be two buttons in the top left: VIEW and SEARCH.
+  - **VIEW:** displays the current list of all inventory items
+  - **SEARCH:** input a specific Item ID (int) to search for that individual item, or specify part of a title (string) to 
+    display any item which contains part of that provided title.
+  - In either case, a new table will be generated.
+- You can locate the visual component (of an adorable, yet chonky tabby cat) on the splash screen, when you initially run the program.
+- You can save the state of my program by the following:
+  - After you have created or loaded a list, there will be a button in the top left: SAVE.  Clicking it will prompt you 
+    to save and overwrite the existing file.
+  - Or, click the X button on the Windows program.  It will prompt you if you want to save before quitting.
+- You can load the state of my program by the following:
+  - On the splash screen, there will be a button to load an existing list.  A test list has already been made for you, simply
+    enter in **The Best List**.  Case and space/punctuation-insensitive.
+  - After you have created or loaded a list, you could alternatively load a different list. There will be a button in the top left: LOAD. 
+  Clicking it will prompt you to enter in the name of a different list to load it.
+- Bonus Feature!
+    - On any of the generated and visible tables, you can click on any of the cells (except for ID) to edit the contents!

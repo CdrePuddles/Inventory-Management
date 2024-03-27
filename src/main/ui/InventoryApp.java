@@ -13,6 +13,8 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 // This is the front-end terminal interface where terminal commands will be processed.
+// NOTE:
+// While this would still work if executed in main, it is no longer part of the main program and has been retired.
 public class InventoryApp {
 
     private InventoryManagement inventoryList;
@@ -24,6 +26,7 @@ public class InventoryApp {
     private JsonReader jsonReader;
 
     // EFFECTS:     starts running the inventory application
+
     public InventoryApp() {
         runInventoryManagement();
     }
