@@ -16,6 +16,8 @@ public class InventoryManagement implements Writable {
     public InventoryManagement(String name) {
         this.name = name;
         this.inventoryList = new LinkedList<>();
+        EventLog.getInstance().logEvent(new Event("Created a new list named " + name));
+
     }
 
     // MODIFIES:    this
@@ -28,6 +30,9 @@ public class InventoryManagement implements Writable {
         }
         InventoryItem inventoryItem = new InventoryItem(assignId(), title, quantity, description);
         this.inventoryList.add(inventoryItem);
+        String event = String.format("Added item with ID: %d, Title: %s, Quantity: %d, and Description: %s",
+                inventoryItem.getId(), title, quantity, description);
+        EventLog.getInstance().logEvent(new Event(event));
     }
 
     // MODIFIES:    this
@@ -36,14 +41,21 @@ public class InventoryManagement implements Writable {
         this.inventoryList.add(inventoryItem);
     }
 
-    // REthQUIRES:    hasItem(id) = true
-    //    // MODIFIES:    this
-    //    // EFFECTS:     removes e inventory item corresponding to the provided ID.
+    // REQUIRES:    hasItem(id) = true
+    // MODIFIES:    this
+    // EFFECTS:     removes e inventory item corresponding to the provided ID.
+    //              logs removal of an item, or no removal of item if item does not exist.
     public void removeItem(int id) {
         int itemPosition = getPositionOfItem(id);
+        String event = "Did not remove item, no such item exists with ID: " + id;
         if (itemPosition >= 0) {
+            event = String.format("Removed item with ID: %d, Title: %s, Quantity: %d, and Description: %s",
+                    inventoryList.get(itemPosition).getId(), inventoryList.get(itemPosition).getTitle(),
+                    inventoryList.get(itemPosition).getQuantity(), inventoryList.get(itemPosition).getDescription());
             this.inventoryList.remove(itemPosition);
         }
+        EventLog.getInstance().logEvent(new Event(event));
+
     }
 
     // MODIFIES:    this
@@ -83,12 +95,19 @@ public class InventoryManagement implements Writable {
     //              provide corresponding item if the ID can be found in the list
     public InventoryItem getItemFromId(int id) {
         InventoryItem ret = null;
+        String event = "Did not find any item with ID: " + id;
+
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getId() == id) {
                 ret = this.inventoryList.get(i);
+                event = String.format("Found Item with ID: %d, with Title: %s, Quantity: %d, and Description: %s",
+                        inventoryList.get(i).getId(), inventoryList.get(i).getTitle(),
+                        inventoryList.get(i).getQuantity(), inventoryList.get(i).getDescription());
             }
         }
+        EventLog.getInstance().logEvent(new Event(event));
+
         return ret;
     }
 
@@ -99,12 +118,15 @@ public class InventoryManagement implements Writable {
     //              NOTE: case-insensitive.
     public LinkedList<InventoryItem> getItemsFromTitle(String text) {
         LinkedList<InventoryItem> ret = new LinkedList<>();
+        int itemCount = 0;
         for (int i = 0; i < getListSize(); i++) {
             InventoryItem item = this.inventoryList.get(i);
             if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
                 ret.add(item);
+                itemCount++;
             }
         }
+        EventLog.getInstance().logEvent(new Event("Found " + itemCount + " item(s) containing \"" + text + "\"."));
         return ret;
     }
 
@@ -124,6 +146,7 @@ public class InventoryManagement implements Writable {
 
     // EFFECTS:     get the entire list of inventory items
     public LinkedList<InventoryItem> getList() {
+        EventLog.getInstance().logEvent(new Event("Viewing list " + this.getName() + "."));
         return this.inventoryList;
     }
 
@@ -155,6 +178,9 @@ public class InventoryManagement implements Writable {
         json.put("name", name);
         // TODO
         json.put("items", itemsToJson());
+
+        EventLog.getInstance().logEvent(new Event("Successfully saved " + this.name + "."));
+
         return json;
     }
 

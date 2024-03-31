@@ -56,3 +56,37 @@ and remove existing items from, my inventory collection" by the following:
   Clicking it will prompt you to enter in the name of a different list to load it.
 - Bonus Feature!
     - On any of the generated and visible tables, you can click on any of the cells (except for ID) to edit the contents!
+
+## Phase 4: Task 2
+- Sat Mar 30 17:37:06 PDT 2024
+  - Created a new list named Event List
+- Sat Mar 30 17:37:06 PDT 2024
+    - Successfully saved Event List.
+- Sat Mar 30 17:37:06 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:37:39 PDT 2024
+    - Added item with ID: 1, Title: First Item, Quantity: 111, and Description: This is the first item to be added.
+- Sat Mar 30 17:37:39 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:39:36 PDT 2024
+    - Added item with ID: 2, Title: Second one, Quantity: 222, and Description: Another item added!
+- Sat Mar 30 17:39:36 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:39:50 PDT 2024
+    - Added item with ID: 3, Title: To be Deleted, Quantity: 42069, and Description: This item will not last long!
+- Sat Mar 30 17:39:50 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:40:56 PDT 2024
+    - Added item with ID: 4, Title: This is OK, Quantity: 444, and Description: This item will be kept, though!
+- Sat Mar 30 17:40:56 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:41:13 PDT 2024
+    - Found 1 item(s) containing "Item".
+- Sat Mar 30 17:41:19 PDT 2024
+    - Found Item with ID: 3, with Title: To be Deleted, Quantity: 42069, and Description: This item will not last long!
+- Sat Mar 30 17:41:27 PDT 2024
+    - Removed item with ID: 3, Title: To be Deleted, Quantity: 42069, and Description: This item will not last long!
+- Sat Mar 30 17:41:28 PDT 2024
+    - Viewing list Event List.
+- Sat Mar 30 17:42:05 PDT 2024
+    - Successfully saved Event List.

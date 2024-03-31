@@ -1,0 +1,23 @@
+{
+    "name": "Event List",
+    "items": [
+        {
+            "quantity": 111,
+            "description": "This is the first item to be added.",
+            "id": 1,
+            "title": "First Item"
+        },
+        {
+            "quantity": 222,
+            "description": "Another item added!",
+            "id": 2,
+            "title": "Second one"
+        },
+        {
+            "quantity": 444,
+            "description": "This item will be kept, though!",
+            "id": 4,
+            "title": "This is OK"
+        }
+    ]
+}
