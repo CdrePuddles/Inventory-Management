@@ -1,6 +1,8 @@
 package ui;
 
 import exceptions.IllegalQuantityException;
+import model.EventLog;
+import model.Event;
 import model.InventoryItem;
 import model.InventoryManagement;
 import persistence.JsonReader;
@@ -77,6 +79,7 @@ public class InventoryAppUI extends JFrame {
     //              before exiting.
     //              If yes, call saveList().  If no, exit program.
     //              If no list exists, exit program.
+    //              Print event log with printLog() upon exiting.
     // CREDIT:      substantively learned from https://www.clear.rice.edu/comp310/JavaResources/frame_close.html
     protected void processWindowEvent(WindowEvent e) {
         if (e.getID() == WindowEvent.WINDOW_CLOSING) {
@@ -94,8 +97,17 @@ public class InventoryAppUI extends JFrame {
                     return;
                 }
             }
+
+            printLog();
             super.processWindowEvent(e);
             System.exit(0);
+        }
+    }
+
+    private void printLog() {
+        EventLog el = EventLog.getInstance();
+        for (Event next : el) {
+            System.out.println(next.toString());
         }
     }
 

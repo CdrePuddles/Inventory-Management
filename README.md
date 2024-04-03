@@ -59,7 +59,7 @@ and remove existing items from, my inventory collection" by the following:
 
 ## Phase 4: Task 2
 - Sat Mar 30 17:37:06 PDT 2024
-  - Created a new list named Event List
+    - Created a new list named Event List
 - Sat Mar 30 17:37:06 PDT 2024
     - Successfully saved Event List.
 - Sat Mar 30 17:37:06 PDT 2024
@@ -90,3 +90,20 @@ and remove existing items from, my inventory collection" by the following:
     - Viewing list Event List.
 - Sat Mar 30 17:42:05 PDT 2024
     - Successfully saved Event List.
+
+## Phase 4: Task 3
+Looking back, there are a number of ways I could refactor to improve the readability and design of the code.  For instance, in
+the InventoryAppUI, there are numerous instances where I call inventoryList.getName() or inventoryList.getList().  I could instead
+declare them at the top of the class.  The reason is, calling methods of inventoryList happens in many methods in the InventoryAppUI.
+They could have been named something like listName or itemList, respectively.  In the odd chance I change one of the method names
+(perhaps from .getList() to .getItems()), the adjustment would only need to be made to the variable itemList at the top, instead of
+looking around through each method for instances where .getItems() is used.  This would reduce coupling.
+
+Another area I could improve upon is improving Single Responsibility among numerous methods.  Looking at welcomeScreen() in the 
+ InventoryAppUI, it is quite a mess.  It has: 1) a try-catch for loading the splash image, 2) a JInternalFrame for holding all the contents, 3) 
+a JPanel for containing the buttons, 4) adding the JPanel to the JInternalFrame, and 5) adding the JInternalFrame to the program window.  
+These could instead be split apart into 5 separate methods.  Thinking about it more, 
+creating a separate method to add JInternalFrame to the program window can be used in many other areas (the button panel, addItemArea panel, etc.).
+Same applies for the JPanel - I could create a separate method which adds JPanels to a JInternalFrame.  I sort of approached this concept
+for itemInputFields(), but it was only designed as a one-time-use for only the item input fields.
+
