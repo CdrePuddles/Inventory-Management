@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 
-// This is the front-end terminal interface where terminal commands will be processed.
+// This is the front-end interface where the UI will be processed.
 public class InventoryAppUI extends JFrame {
 
     private InventoryManagement inventoryList;
@@ -104,6 +104,7 @@ public class InventoryAppUI extends JFrame {
         }
     }
 
+    // EFFECTS:   prints the eventLog to console upon exiting the program.
     private void printLog() {
         EventLog el = EventLog.getInstance();
         for (Event next : el) {

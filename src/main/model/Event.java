@@ -5,7 +5,9 @@ import java.util.Date;
 
 
 /**
- * Represents an alarm system event.
+ * Represents an inventory system event.
+ * CREDIT:      this portion is taken from the AlarmSystem code provided as a reference for the term project,
+ *              as instructed
  */
 public class Event {
     private static final int HASH_CONSTANT = 13;

@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Represents a log of alarm system events.
+ * Represents a log of inventory system events.
  * We use the Singleton Design Pattern to ensure that there is only
  * one EventLog in the system and that the system has global access
  * to the single instance of the EventLog.
+ * CREDIT:      this portion is taken from the AlarmSystem code provided as a reference for the term project,
+ *              as instructed
  */
 public class EventLog implements Iterable<Event> {
     /**

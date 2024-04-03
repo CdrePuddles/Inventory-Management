@@ -13,6 +13,8 @@ public class InventoryManagement implements Writable {
     private final LinkedList<InventoryItem> inventoryList;    // list of inventory items
 
     // EFFECTS:     Creates an inventory list with no InventoryItems added.
+    //              logs the creation, or loading, of an inventory list
+
     public InventoryManagement(String name) {
         this.name = name;
         this.inventoryList = new LinkedList<>();
@@ -24,6 +26,7 @@ public class InventoryManagement implements Writable {
     // EFFECTS:     adds the provided inventory item to the end of the list,
     //              assigning a unique ID
     //              If provided quantity < 0, throw IllegalQuantityException()
+    //              logs the addition of an item
     public void addItem(String title, int quantity, String description) {
         if (quantity < 0) {
             throw new IllegalQuantityException();
@@ -93,6 +96,7 @@ public class InventoryManagement implements Writable {
     // REQUIRES:    hasItem(id) = true
     // EFFECTS:     check the IDs in the list against the provided ID.
     //              provide corresponding item if the ID can be found in the list
+    //              logs parameters of the item found, or logs being unable to find an item with the associated ID
     public InventoryItem getItemFromId(int id) {
         InventoryItem ret = null;
         String event = "Did not find any item with ID: " + id;
@@ -116,6 +120,7 @@ public class InventoryManagement implements Writable {
     //              add to a temporary list any item whose title contains the provided title
     //              if no criteria is matched, return an empty list
     //              NOTE: case-insensitive.
+    //              logs parameters of the item(s) found, or logs being unable to find an item(s) containing the string
     public LinkedList<InventoryItem> getItemsFromTitle(String text) {
         LinkedList<InventoryItem> ret = new LinkedList<>();
         int itemCount = 0;
@@ -145,6 +150,7 @@ public class InventoryManagement implements Writable {
     }
 
     // EFFECTS:     get the entire list of inventory items
+    //              logs each time the list is viewed
     public LinkedList<InventoryItem> getList() {
         EventLog.getInstance().logEvent(new Event("Viewing list " + this.getName() + "."));
         return this.inventoryList;
@@ -172,6 +178,8 @@ public class InventoryManagement implements Writable {
     //              provided as a reference for the term project
 
     // EFFECTS:    creates a new JSON object of the entire inventory list
+    //             logs if the list is saved
+
     @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
